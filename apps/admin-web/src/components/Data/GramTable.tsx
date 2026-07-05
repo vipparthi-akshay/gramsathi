@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Box,
   Checkbox,
@@ -17,11 +17,10 @@ import {
   TableSortLabel,
   Paper,
   Chip,
-} from '@mui/material';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import FileDownloadIcon from '@mui/icons-material/FileDownload';
-import DeleteIcon from '@mui/icons-material/Delete';
-
+} from "@mui/material";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 export interface ColumnDef<T> {
   id: string;
@@ -29,7 +28,7 @@ export interface ColumnDef<T> {
   render: (row: T) => React.ReactNode;
   sortable?: boolean;
   width?: string | number;
-  align?: 'left' | 'center' | 'right';
+  align?: "left" | "center" | "right";
 }
 
 interface GramTableProps<T> {
@@ -66,15 +65,15 @@ export default function GramTable<T>({
   onExport,
   onDelete,
   actions,
-  emptyMessage = 'No data found',
+  emptyMessage = "No data found",
 }: GramTableProps<T>) {
-  const [sortColumn, setSortColumn] = useState<string>('');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [sortColumn, setSortColumn] = useState<string>("");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleSort = (column: string) => {
-    const isAsc = sortColumn === column && sortDirection === 'asc';
-    setSortDirection(isAsc ? 'desc' : 'asc');
+    const isAsc = sortColumn === column && sortDirection === "asc";
+    setSortDirection(isAsc ? "desc" : "asc");
     setSortColumn(column);
   };
 
@@ -100,9 +99,11 @@ export default function GramTable<T>({
   const rowCount = data.length;
 
   return (
-    <Paper sx={{ width: '100%', overflow: 'hidden', borderRadius: 2 }}>
+    <Paper sx={{ width: "100%", overflow: "hidden", borderRadius: 2 }}>
       {(selectable || onExport || onDelete) && (
-        <Box sx={{ display: 'flex', alignItems: 'center', p: 1, pl: 2, gap: 1 }}>
+        <Box
+          sx={{ display: "flex", alignItems: "center", p: 1, pl: 2, gap: 1 }}
+        >
           {selectable && numSelected > 0 && (
             <Typography variant="body2" color="text.secondary">
               {numSelected} selected
@@ -142,13 +143,17 @@ export default function GramTable<T>({
               {columns.map((col) => (
                 <TableCell
                   key={col.id}
-                  align={col.align || 'left'}
-                  sx={{ fontWeight: 600, whiteSpace: 'nowrap', width: col.width }}
+                  align={col.align || "left"}
+                  sx={{
+                    fontWeight: 600,
+                    whiteSpace: "nowrap",
+                    width: col.width,
+                  }}
                 >
                   {col.sortable ? (
                     <TableSortLabel
                       active={sortColumn === col.id}
-                      direction={sortColumn === col.id ? sortDirection : 'asc'}
+                      direction={sortColumn === col.id ? sortDirection : "asc"}
                       onClick={() => handleSort(col.id)}
                     >
                       {col.label}
@@ -158,14 +163,25 @@ export default function GramTable<T>({
                   )}
                 </TableCell>
               ))}
-              {actions && <TableCell sx={{ fontWeight: 600 }}>Actions</TableCell>}
+              {actions && (
+                <TableCell sx={{ fontWeight: 600 }}>Actions</TableCell>
+              )}
             </TableRow>
           </TableHead>
           <TableBody>
             {data.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={columns.length + (selectable ? 1 : 0) + (actions ? 1 : 0)} align="center">
-                  <Typography variant="body2" color="text.secondary" sx={{ py: 4 }}>
+                <TableCell
+                  colSpan={
+                    columns.length + (selectable ? 1 : 0) + (actions ? 1 : 0)
+                  }
+                  align="center"
+                >
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ py: 4 }}
+                  >
                     {emptyMessage}
                   </Typography>
                 </TableCell>
@@ -178,7 +194,7 @@ export default function GramTable<T>({
                     key={id}
                     hover
                     selected={selected.includes(id)}
-                    sx={{ cursor: 'pointer', '&:last-child td': { border: 0 } }}
+                    sx={{ cursor: "pointer", "&:last-child td": { border: 0 } }}
                   >
                     {selectable && (
                       <TableCell padding="checkbox">
@@ -189,15 +205,11 @@ export default function GramTable<T>({
                       </TableCell>
                     )}
                     {columns.map((col) => (
-                      <TableCell key={col.id} align={col.align || 'left'}>
+                      <TableCell key={col.id} align={col.align || "left"}>
                         {col.render(row)}
                       </TableCell>
                     ))}
-                    {actions && (
-                      <TableCell>
-                        {actions(row)}
-                      </TableCell>
-                    )}
+                    {actions && <TableCell>{actions(row)}</TableCell>}
                   </TableRow>
                 );
               })

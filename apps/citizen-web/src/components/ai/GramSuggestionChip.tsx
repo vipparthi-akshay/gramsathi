@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { motion, AnimatePresence } from 'framer-motion';
-import Chip from '@mui/material/Chip';
-import Box from '@mui/material/Box';
+import { motion, AnimatePresence } from "framer-motion";
+import Chip from "@mui/material/Chip";
+import Box from "@mui/material/Box";
 
 interface GramSuggestionChipProps {
   label: string;
@@ -10,7 +10,11 @@ interface GramSuggestionChipProps {
   index?: number;
 }
 
-export default function GramSuggestionChip({ label, onClick, index = 0 }: GramSuggestionChipProps) {
+export default function GramSuggestionChip({
+  label,
+  onClick,
+  index = 0,
+}: GramSuggestionChipProps) {
   return (
     <AnimatePresence>
       <motion.div
@@ -18,7 +22,7 @@ export default function GramSuggestionChip({ label, onClick, index = 0 }: GramSu
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: -10, scale: 0.9 }}
         transition={{ delay: index * 0.05, duration: 0.2 }}
-        style={{ display: 'inline-block' }}
+        style={{ display: "inline-block" }}
       >
         <Chip
           label={label}
@@ -28,22 +32,22 @@ export default function GramSuggestionChip({ label, onClick, index = 0 }: GramSu
           sx={{
             borderRadius: 28,
             height: 36,
-            fontSize: '0.875rem',
-            cursor: 'pointer',
-            '&:hover': {
-              backgroundColor: 'primary.main',
-              color: 'primary.contrastText',
+            fontSize: "0.875rem",
+            cursor: "pointer",
+            "&:hover": {
+              backgroundColor: "primary.main",
+              color: "primary.contrastText",
             },
-            '&:focus-visible': {
-              outline: '3px solid',
-              outlineColor: 'primary.main',
+            "&:focus-visible": {
+              outline: "3px solid",
+              outlineColor: "primary.main",
               outlineOffset: 2,
             },
           }}
           aria-label={`Suggestion: ${label}`}
           tabIndex={0}
           onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
+            if (e.key === "Enter" || e.key === " ") {
               e.preventDefault();
               onClick(label);
             }
@@ -66,12 +70,12 @@ export function GramSuggestionRow({
   return (
     <Box
       sx={{
-        display: 'flex',
+        display: "flex",
         gap: 1,
-        flexWrap: 'wrap',
+        flexWrap: "wrap",
         px: 2,
         py: 1,
-        overflowX: 'auto',
+        overflowX: "auto",
       }}
       role="list"
       aria-label="Quick suggestions"

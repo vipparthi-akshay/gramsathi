@@ -1,5 +1,5 @@
-import api from './api';
-import type { ApiResponse } from './api';
+import api from "./api";
+import type { ApiResponse } from "./api";
 
 export interface ImpactMetrics {
   citizensReached: number;
@@ -37,26 +37,33 @@ export interface AIPerformance {
 }
 
 export async function getImpactMetrics(): Promise<ImpactMetrics> {
-  const { data } = await api.get<ApiResponse<ImpactMetrics>>('/analytics/impact');
+  const { data } =
+    await api.get<ApiResponse<ImpactMetrics>>("/analytics/impact");
   return data.data;
 }
 
 export async function getLanguageUsage(): Promise<LanguageUsage[]> {
-  const { data } = await api.get<ApiResponse<LanguageUsage[]>>('/analytics/languages');
+  const { data } = await api.get<ApiResponse<LanguageUsage[]>>(
+    "/analytics/languages",
+  );
   return data.data;
 }
 
 export async function getGeoData(): Promise<GeoData[]> {
-  const { data } = await api.get<ApiResponse<GeoData[]>>('/analytics/geo');
+  const { data } = await api.get<ApiResponse<GeoData[]>>("/analytics/geo");
   return data.data;
 }
 
 export async function getSchemeCategories(): Promise<SchemeCategoryData[]> {
-  const { data } = await api.get<ApiResponse<SchemeCategoryData[]>>('/analytics/scheme-categories');
+  const { data } = await api.get<ApiResponse<SchemeCategoryData[]>>(
+    "/analytics/scheme-categories",
+  );
   return data.data;
 }
 
 export async function getAIPerformance(): Promise<AIPerformance> {
-  const { data } = await api.get<ApiResponse<AIPerformance>>('/analytics/ai-performance');
+  const { data } = await api.get<ApiResponse<AIPerformance>>(
+    "/analytics/ai-performance",
+  );
   return data.data;
 }

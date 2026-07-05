@@ -1,8 +1,8 @@
-import api from './api';
-import type { ApiResponse, PaginatedResponse } from './api';
+import api from "./api";
+import type { ApiResponse, PaginatedResponse } from "./api";
 
-export type GrievanceStatus = 'open' | 'escalated' | 'resolved' | 'closed';
-export type SentimentType = 'positive' | 'neutral' | 'negative' | 'angry';
+export type GrievanceStatus = "open" | "escalated" | "resolved" | "closed";
+export type SentimentType = "positive" | "neutral" | "negative" | "angry";
 
 export interface Grievance {
   id: string;
@@ -16,7 +16,7 @@ export interface Grievance {
   status: GrievanceStatus;
   sentiment: SentimentType;
   sentimentScore: number;
-  priority: 'low' | 'medium' | 'high' | 'critical';
+  priority: "low" | "medium" | "high" | "critical";
   assignedTo?: string;
   assignedToName?: string;
   createdAt: string;
@@ -34,8 +34,17 @@ export interface TrackingEntry {
   timestamp: string;
 }
 
-export async function getGrievances(params?: { page?: number; limit?: number; status?: GrievanceStatus; search?: string; department?: string }): Promise<PaginatedResponse<Grievance>> {
-  const { data } = await api.get<ApiResponse<PaginatedResponse<Grievance>>>('/grievances', { params });
+export async function getGrievances(params?: {
+  page?: number;
+  limit?: number;
+  status?: GrievanceStatus;
+  search?: string;
+  department?: string;
+}): Promise<PaginatedResponse<Grievance>> {
+  const { data } = await api.get<ApiResponse<PaginatedResponse<Grievance>>>(
+    "/grievances",
+    { params },
+  );
   return data.data;
 }
 
@@ -44,22 +53,46 @@ export async function getGrievance(id: string): Promise<Grievance> {
   return data.data;
 }
 
-export async function assignGrievance(id: string, officerId: string): Promise<Grievance> {
-  const { data } = await api.post<ApiResponse<Grievance>>(`/grievances/${id}/assign`, { officerId });
+export async function assignGrievance(
+  id: string,
+  officerId: string,
+): Promise<Grievance> {
+  const { data } = await api.post<ApiResponse<Grievance>>(
+    `/grievances/${id}/assign`,
+    { officerId },
+  );
   return data.data;
 }
 
-export async function resolveGrievance(id: string, resolution: string): Promise<Grievance> {
-  const { data } = await api.post<ApiResponse<Grievance>>(`/grievances/${id}/resolve`, { resolution });
+export async function resolveGrievance(
+  id: string,
+  resolution: string,
+): Promise<Grievance> {
+  const { data } = await api.post<ApiResponse<Grievance>>(
+    `/grievances/${id}/resolve`,
+    { resolution },
+  );
   return data.data;
 }
 
-export async function escalateGrievance(id: string, reason: string): Promise<Grievance> {
-  const { data } = await api.post<ApiResponse<Grievance>>(`/grievances/${id}/escalate`, { reason });
+export async function escalateGrievance(
+  id: string,
+  reason: string,
+): Promise<Grievance> {
+  const { data } = await api.post<ApiResponse<Grievance>>(
+    `/grievances/${id}/escalate`,
+    { reason },
+  );
   return data.data;
 }
 
-export async function addTrackingEntry(id: string, entry: { action: string; note: string }): Promise<Grievance> {
-  const { data } = await api.post<ApiResponse<Grievance>>(`/grievances/${id}/tracking`, entry);
+export async function addTrackingEntry(
+  id: string,
+  entry: { action: string; note: string },
+): Promise<Grievance> {
+  const { data } = await api.post<ApiResponse<Grievance>>(
+    `/grievances/${id}/tracking`,
+    entry,
+  );
   return data.data;
 }

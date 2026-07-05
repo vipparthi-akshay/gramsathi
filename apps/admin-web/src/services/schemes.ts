@@ -1,5 +1,5 @@
-import api from './api';
-import type { ApiResponse, PaginatedResponse } from './api';
+import api from "./api";
+import type { ApiResponse, PaginatedResponse } from "./api";
 
 export interface Scheme {
   id: string;
@@ -38,8 +38,17 @@ export interface SchemeFormData {
   budget: number;
 }
 
-export async function getSchemes(params?: { page?: number; limit?: number; search?: string; category?: string; isActive?: boolean }): Promise<PaginatedResponse<Scheme>> {
-  const { data } = await api.get<ApiResponse<PaginatedResponse<Scheme>>>('/schemes', { params });
+export async function getSchemes(params?: {
+  page?: number;
+  limit?: number;
+  search?: string;
+  category?: string;
+  isActive?: boolean;
+}): Promise<PaginatedResponse<Scheme>> {
+  const { data } = await api.get<ApiResponse<PaginatedResponse<Scheme>>>(
+    "/schemes",
+    { params },
+  );
   return data.data;
 }
 
@@ -49,17 +58,22 @@ export async function getScheme(id: string): Promise<Scheme> {
 }
 
 export async function createScheme(scheme: SchemeFormData): Promise<Scheme> {
-  const { data } = await api.post<ApiResponse<Scheme>>('/schemes', scheme);
+  const { data } = await api.post<ApiResponse<Scheme>>("/schemes", scheme);
   return data.data;
 }
 
-export async function updateScheme(id: string, scheme: Partial<SchemeFormData>): Promise<Scheme> {
+export async function updateScheme(
+  id: string,
+  scheme: Partial<SchemeFormData>,
+): Promise<Scheme> {
   const { data } = await api.put<ApiResponse<Scheme>>(`/schemes/${id}`, scheme);
   return data.data;
 }
 
 export async function toggleSchemeActive(id: string): Promise<Scheme> {
-  const { data } = await api.patch<ApiResponse<Scheme>>(`/schemes/${id}/toggle`);
+  const { data } = await api.patch<ApiResponse<Scheme>>(
+    `/schemes/${id}/toggle`,
+  );
   return data.data;
 }
 
@@ -68,6 +82,6 @@ export async function deleteScheme(id: string): Promise<void> {
 }
 
 export async function getSchemeCategories(): Promise<string[]> {
-  const { data } = await api.get<ApiResponse<string[]>>('/schemes/categories');
+  const { data } = await api.get<ApiResponse<string[]>>("/schemes/categories");
   return data.data;
 }

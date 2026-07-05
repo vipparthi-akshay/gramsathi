@@ -1,54 +1,63 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Box from '@mui/material/Box';
-import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
-import TextField from '@mui/material/TextField';
-import IconButton from '@mui/material/IconButton';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import Stepper from '@mui/material/Stepper';
-import Step from '@mui/material/Step';
-import StepLabel from '@mui/material/StepLabel';
-import Chip from '@mui/material/Chip';
-import Stack from '@mui/material/Stack';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import MicIcon from '@mui/icons-material/Mic';
-import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
-import GramButton from '@/components/ui/GramButton';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Box from "@mui/material/Box";
+import Container from "@mui/material/Container";
+import Typography from "@mui/material/Typography";
+import TextField from "@mui/material/TextField";
+import IconButton from "@mui/material/IconButton";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Stepper from "@mui/material/Stepper";
+import Step from "@mui/material/Step";
+import StepLabel from "@mui/material/StepLabel";
+import Chip from "@mui/material/Chip";
+import Stack from "@mui/material/Stack";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import MicIcon from "@mui/icons-material/Mic";
+import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
+import GramButton from "@/components/ui/GramButton";
 
-const steps = ['Describe Issue', 'AI Draft', 'Review', 'Department', 'Submit'];
+const steps = ["Describe Issue", "AI Draft", "Review", "Department", "Submit"];
 
 const departments = [
-  'Agriculture Department', 'Revenue Department', 'Education Department',
-  'Health Department', 'Social Welfare Department', 'Panchayati Raj',
-  'Water Supply Department', 'Electricity Department', 'Police Department', 'Other Department',
+  "Agriculture Department",
+  "Revenue Department",
+  "Education Department",
+  "Health Department",
+  "Social Welfare Department",
+  "Panchayati Raj",
+  "Water Supply Department",
+  "Electricity Department",
+  "Police Department",
+  "Other Department",
 ];
 
 export default function NewGrievancePage() {
   const router = useRouter();
   const [step, setStep] = useState(0);
-  const [description, setDescription] = useState('');
-  const [aiDraft, setAiDraft] = useState('');
-  const [department, setDepartment] = useState('');
+  const [description, setDescription] = useState("");
+  const [aiDraft, setAiDraft] = useState("");
+  const [department, setDepartment] = useState("");
 
   const handleAIDraft = () => {
     setAiDraft(
-      `Subject: Regarding ${description.split(' ').slice(0, 5).join(' ')}...\n\n` +
-      `Respected Sir/Madam,\n\n` +
-      `I am writing to bring to your attention the issue of ${description}\n\n` +
-      `I request you to kindly take necessary action at the earliest.\n\n` +
-      `Thanking you,\n[Your Name]\n[Your Address]`
+      `Subject: Regarding ${description.split(" ").slice(0, 5).join(" ")}...\n\n` +
+        `Respected Sir/Madam,\n\n` +
+        `I am writing to bring to your attention the issue of ${description}\n\n` +
+        `I request you to kindly take necessary action at the earliest.\n\n` +
+        `Thanking you,\n[Your Name]\n[Your Address]`,
     );
     setStep(2);
   };
 
   return (
-    <Box sx={{ minHeight: '100vh', pb: 9, backgroundColor: 'background.default' }}>
+    <Box
+      sx={{ minHeight: "100vh", pb: 9, backgroundColor: "background.default" }}
+    >
       <Container maxWidth="sm" sx={{ px: 2 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 2 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1, py: 2 }}>
           <IconButton onClick={() => router.back()} aria-label="Back">
             <ArrowBackIcon />
           </IconButton>
@@ -114,7 +123,7 @@ export default function NewGrievancePage() {
               sx={{ mb: 2 }}
               aria-label="Complaint draft"
             />
-            <Box sx={{ display: 'flex', gap: 1 }}>
+            <Box sx={{ display: "flex", gap: 1 }}>
               <GramButton variant="outlined" onClick={() => setStep(0)}>
                 Edit Description
               </GramButton>
@@ -136,14 +145,21 @@ export default function NewGrievancePage() {
                   key={dept}
                   sx={{
                     borderRadius: 2,
-                    cursor: 'pointer',
-                    border: department === dept ? '2px solid' : '2px solid transparent',
-                    borderColor: department === dept ? 'primary.main' : 'transparent',
+                    cursor: "pointer",
+                    border:
+                      department === dept
+                        ? "2px solid"
+                        : "2px solid transparent",
+                    borderColor:
+                      department === dept ? "primary.main" : "transparent",
                   }}
                   onClick={() => setDepartment(dept)}
                 >
                   <CardContent sx={{ py: 1.5 }}>
-                    <Typography variant="body2" fontWeight={department === dept ? 600 : 400}>
+                    <Typography
+                      variant="body2"
+                      fontWeight={department === dept ? 600 : 400}
+                    >
                       {dept}
                     </Typography>
                   </CardContent>
@@ -163,9 +179,14 @@ export default function NewGrievancePage() {
         )}
 
         {step === 4 && (
-          <Card sx={{ borderRadius: 3, textAlign: 'center', py: 4 }}>
+          <Card sx={{ borderRadius: 3, textAlign: "center", py: 4 }}>
             <CardContent>
-              <Typography variant="h5" color="success.main" fontWeight={700} sx={{ mb: 1 }}>
+              <Typography
+                variant="h5"
+                color="success.main"
+                fontWeight={700}
+                sx={{ mb: 1 }}
+              >
                 ✓ Complaint Submitted!
               </Typography>
               <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>
@@ -174,7 +195,10 @@ export default function NewGrievancePage() {
               <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
                 Expected resolution within 15 days
               </Typography>
-              <GramButton variant="primary" onClick={() => router.push('/grievances')}>
+              <GramButton
+                variant="primary"
+                onClick={() => router.push("/grievances")}
+              >
                 View My Complaints
               </GramButton>
             </CardContent>

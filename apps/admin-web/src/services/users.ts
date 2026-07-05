@@ -1,11 +1,11 @@
-import api from './api';
-import type { ApiResponse, PaginatedResponse } from './api';
+import api from "./api";
+import type { ApiResponse, PaginatedResponse } from "./api";
 
 export interface SystemUser {
   id: string;
   email: string;
   name: string;
-  role: 'officer' | 'admin' | 'super_admin';
+  role: "officer" | "admin" | "super_admin";
   department: string;
   phone: string;
   isActive: boolean;
@@ -23,8 +23,17 @@ export interface CreateUserData {
   password: string;
 }
 
-export async function getUsers(params?: { page?: number; limit?: number; search?: string; role?: string; isActive?: boolean }): Promise<PaginatedResponse<SystemUser>> {
-  const { data } = await api.get<ApiResponse<PaginatedResponse<SystemUser>>>('/users', { params });
+export async function getUsers(params?: {
+  page?: number;
+  limit?: number;
+  search?: string;
+  role?: string;
+  isActive?: boolean;
+}): Promise<PaginatedResponse<SystemUser>> {
+  const { data } = await api.get<ApiResponse<PaginatedResponse<SystemUser>>>(
+    "/users",
+    { params },
+  );
   return data.data;
 }
 
@@ -34,12 +43,18 @@ export async function getUser(id: string): Promise<SystemUser> {
 }
 
 export async function createUser(user: CreateUserData): Promise<SystemUser> {
-  const { data } = await api.post<ApiResponse<SystemUser>>('/users', user);
+  const { data } = await api.post<ApiResponse<SystemUser>>("/users", user);
   return data.data;
 }
 
-export async function updateUser(id: string, updates: Partial<SystemUser>): Promise<SystemUser> {
-  const { data } = await api.put<ApiResponse<SystemUser>>(`/users/${id}`, updates);
+export async function updateUser(
+  id: string,
+  updates: Partial<SystemUser>,
+): Promise<SystemUser> {
+  const { data } = await api.put<ApiResponse<SystemUser>>(
+    `/users/${id}`,
+    updates,
+  );
   return data.data;
 }
 
@@ -48,11 +63,19 @@ export async function deleteUser(id: string): Promise<void> {
 }
 
 export async function toggleUserActive(id: string): Promise<SystemUser> {
-  const { data } = await api.patch<ApiResponse<SystemUser>>(`/users/${id}/toggle-active`);
+  const { data } = await api.patch<ApiResponse<SystemUser>>(
+    `/users/${id}/toggle-active`,
+  );
   return data.data;
 }
 
-export async function updateUserPermissions(id: string, permissions: string[]): Promise<SystemUser> {
-  const { data } = await api.put<ApiResponse<SystemUser>>(`/users/${id}/permissions`, { permissions });
+export async function updateUserPermissions(
+  id: string,
+  permissions: string[],
+): Promise<SystemUser> {
+  const { data } = await api.put<ApiResponse<SystemUser>>(
+    `/users/${id}/permissions`,
+    { permissions },
+  );
   return data.data;
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   AppBar,
   Toolbar,
@@ -13,29 +13,29 @@ import {
   MenuItem,
   Tooltip,
   Divider,
-} from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
-import SearchIcon from '@mui/icons-material/Search';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import Brightness4Icon from '@mui/icons-material/Brightness4';
-import Brightness7Icon from '@mui/icons-material/Brightness7';
-import LanguageIcon from '@mui/icons-material/Language';
-import LogoutIcon from '@mui/icons-material/Logout';
-import SettingsIcon from '@mui/icons-material/Settings';
-import PersonIcon from '@mui/icons-material/Person';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/store/authStore';
-import { useThemeMode } from '@/theme/ThemeRegistry';
+} from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
+import SearchIcon from "@mui/icons-material/Search";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import Brightness4Icon from "@mui/icons-material/Brightness4";
+import Brightness7Icon from "@mui/icons-material/Brightness7";
+import LanguageIcon from "@mui/icons-material/Language";
+import LogoutIcon from "@mui/icons-material/Logout";
+import SettingsIcon from "@mui/icons-material/Settings";
+import PersonIcon from "@mui/icons-material/Person";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/store/authStore";
+import { useThemeMode } from "@/theme/ThemeRegistry";
 
 interface HeaderProps {
   onToggleSidebar: () => void;
 }
 
 const languages = [
-  { code: 'en', label: 'English' },
-  { code: 'hi', label: 'हिन्दी' },
-  { code: 'mr', label: 'मराठी' },
-  { code: 'ta', label: 'தமிழ்' },
+  { code: "en", label: "English" },
+  { code: "hi", label: "हिन्दी" },
+  { code: "mr", label: "मराठी" },
+  { code: "ta", label: "தமிழ்" },
 ];
 
 export default function Header({ onToggleSidebar }: HeaderProps) {
@@ -49,7 +49,7 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
   const handleLogout = () => {
     setAnchorEl(null);
     logout();
-    navigate('/login');
+    navigate("/login");
   };
 
   return (
@@ -57,10 +57,10 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
       position="sticky"
       elevation={0}
       sx={{
-        backgroundColor: 'background.paper',
-        borderBottom: '1px solid',
-        borderColor: 'divider',
-        color: 'text.primary',
+        backgroundColor: "background.paper",
+        borderBottom: "1px solid",
+        borderColor: "divider",
+        color: "text.primary",
       }}
     >
       <Toolbar sx={{ minHeight: 64, px: { xs: 1, sm: 2 } }}>
@@ -73,9 +73,9 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
           placeholder="Search schemes, citizens, applications..."
           sx={{
             maxWidth: 400,
-            flex: { xs: 1, sm: 'none' },
-            '& .MuiOutlinedInput-root': {
-              backgroundColor: 'action.hover',
+            flex: { xs: 1, sm: "none" },
+            "& .MuiOutlinedInput-root": {
+              backgroundColor: "action.hover",
               borderRadius: 3,
             },
           }}
@@ -90,14 +90,20 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
 
         <Box sx={{ flex: 1 }} />
 
-        <Tooltip title={`Switch to ${mode === 'light' ? 'dark' : 'light'} mode`}>
+        <Tooltip
+          title={`Switch to ${mode === "light" ? "dark" : "light"} mode`}
+        >
           <IconButton onClick={toggleTheme} size="small" sx={{ mx: 0.5 }}>
-            {mode === 'light' ? <Brightness4Icon /> : <Brightness7Icon />}
+            {mode === "light" ? <Brightness4Icon /> : <Brightness7Icon />}
           </IconButton>
         </Tooltip>
 
         <Tooltip title="Language">
-          <IconButton onClick={(e) => setLangAnchor(e.currentTarget)} size="small" sx={{ mx: 0.5 }}>
+          <IconButton
+            onClick={(e) => setLangAnchor(e.currentTarget)}
+            size="small"
+            sx={{ mx: 0.5 }}
+          >
             <LanguageIcon />
           </IconButton>
         </Tooltip>
@@ -114,7 +120,11 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
         </Menu>
 
         <Tooltip title="Notifications">
-          <IconButton onClick={(e) => setNotifAnchor(e.currentTarget)} size="small" sx={{ mx: 0.5 }}>
+          <IconButton
+            onClick={(e) => setNotifAnchor(e.currentTarget)}
+            size="small"
+            sx={{ mx: 0.5 }}
+          >
             <Badge badgeContent={3} color="error">
               <NotificationsIcon />
             </Badge>
@@ -124,39 +134,76 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
           anchorEl={notifAnchor}
           open={Boolean(notifAnchor)}
           onClose={() => setNotifAnchor(null)}
-          sx={{ '& .MuiPaper-root': { minWidth: 280 } }}
+          sx={{ "& .MuiPaper-root": { minWidth: 280 } }}
         >
           <MenuItem onClick={() => setNotifAnchor(null)}>
             <Box>
-              <Typography variant="body2" fontWeight={600}>New Application</Typography>
-              <Typography variant="caption" color="text.secondary">Ramesh applied for Kisan Samman Yojana</Typography>
+              <Typography variant="body2" fontWeight={600}>
+                New Application
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                Ramesh applied for Kisan Samman Yojana
+              </Typography>
             </Box>
           </MenuItem>
           <MenuItem onClick={() => setNotifAnchor(null)}>
             <Box>
-              <Typography variant="body2" fontWeight={600}>Grievance Escalated</Typography>
-              <Typography variant="caption" color="text.secondary">Water supply issue escalated to department</Typography>
+              <Typography variant="body2" fontWeight={600}>
+                Grievance Escalated
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                Water supply issue escalated to department
+              </Typography>
             </Box>
           </MenuItem>
           <MenuItem onClick={() => setNotifAnchor(null)}>
             <Box>
-              <Typography variant="body2" fontWeight={600}>Scheme Expiring</Typography>
-              <Typography variant="caption" color="text.secondary">PM Awas Yojana closing in 7 days</Typography>
+              <Typography variant="body2" fontWeight={600}>
+                Scheme Expiring
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                PM Awas Yojana closing in 7 days
+              </Typography>
             </Box>
           </MenuItem>
         </Menu>
 
         <Box
           onClick={(e) => setAnchorEl(e.currentTarget)}
-          sx={{ display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer', ml: 1 }}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            cursor: "pointer",
+            ml: 1,
+          }}
         >
-          <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main', fontSize: 13 }}>
-            {user?.name?.split(' ').map((n) => n[0]).join('')}
+          <Avatar
+            sx={{
+              width: 32,
+              height: 32,
+              bgcolor: "primary.main",
+              fontSize: 13,
+            }}
+          >
+            {user?.name
+              ?.split(" ")
+              .map((n) => n[0])
+              .join("")}
           </Avatar>
-          <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-            <Typography variant="body2" sx={{ fontWeight: 600, lineHeight: 1.2 }}>{user?.name}</Typography>
-            <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'capitalize' }}>
-              {user?.role?.replace('_', ' ')}
+          <Box sx={{ display: { xs: "none", sm: "block" } }}>
+            <Typography
+              variant="body2"
+              sx={{ fontWeight: 600, lineHeight: 1.2 }}
+            >
+              {user?.name}
+            </Typography>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ textTransform: "capitalize" }}
+            >
+              {user?.role?.replace("_", " ")}
             </Typography>
           </Box>
         </Box>
@@ -165,10 +212,20 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
           open={Boolean(anchorEl)}
           onClose={() => setAnchorEl(null)}
         >
-          <MenuItem onClick={() => { setAnchorEl(null); navigate('/settings'); }}>
+          <MenuItem
+            onClick={() => {
+              setAnchorEl(null);
+              navigate("/settings");
+            }}
+          >
             <PersonIcon fontSize="small" sx={{ mr: 1 }} /> Profile
           </MenuItem>
-          <MenuItem onClick={() => { setAnchorEl(null); navigate('/settings'); }}>
+          <MenuItem
+            onClick={() => {
+              setAnchorEl(null);
+              navigate("/settings");
+            }}
+          >
             <SettingsIcon fontSize="small" sx={{ mr: 1 }} /> Settings
           </MenuItem>
           <Divider />

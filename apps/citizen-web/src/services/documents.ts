@@ -1,4 +1,4 @@
-import api from './api';
+import api from "./api";
 
 export interface Document {
   id: string;
@@ -7,7 +7,7 @@ export interface Document {
   fileName: string;
   fileSize: number;
   mimeType: string;
-  status: 'verified' | 'pending' | 'rejected' | 'needs_review';
+  status: "verified" | "pending" | "rejected" | "needs_review";
   extractedData?: Record<string, string>;
   confidence?: number;
   verifiedAt?: string;
@@ -17,12 +17,16 @@ export interface Document {
 }
 
 export const documentApi = {
-  uploadDocument: async (file: File, type: string, onProgress?: (percent: number) => void): Promise<Document> => {
+  uploadDocument: async (
+    file: File,
+    type: string,
+    onProgress?: (percent: number) => void,
+  ): Promise<Document> => {
     const formData = new FormData();
-    formData.append('file', file);
-    formData.append('type', type);
-    const { data } = await api.post('/documents/upload', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    formData.append("file", file);
+    formData.append("type", type);
+    const { data } = await api.post("/documents/upload", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
       onUploadProgress: (event) => {
         if (onProgress && event.total) {
           onProgress(Math.round((event.loaded * 100) / event.total));
@@ -33,7 +37,7 @@ export const documentApi = {
   },
 
   getDocuments: async () => {
-    const { data } = await api.get('/documents');
+    const { data } = await api.get("/documents");
     return data;
   },
 

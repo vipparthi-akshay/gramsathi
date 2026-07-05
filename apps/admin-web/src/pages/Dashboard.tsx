@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Grid,
@@ -16,30 +16,70 @@ import {
   TableRow,
   Paper,
   IconButton,
-} from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import RefreshIcon from '@mui/icons-material/Refresh';
-import { useTheme } from '@mui/material/styles';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import KPICard from '@/components/Dashboard/KPICard';
-import AIInsightsPanel from '@/components/Dashboard/AIInsightsPanel';
-import GeoHeatMap from '@/components/Dashboard/GeoHeatMap';
-import StatusBadge from '@/components/Data/StatusBadge';
-import { useDashboardStore } from '@/store/dashboardStore';
-import type { KPI } from '@/store/dashboardStore';
+} from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import { useTheme } from "@mui/material/styles";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from "recharts";
+import KPICard from "@/components/Dashboard/KPICard";
+import AIInsightsPanel from "@/components/Dashboard/AIInsightsPanel";
+import GeoHeatMap from "@/components/Dashboard/GeoHeatMap";
+import StatusBadge from "@/components/Data/StatusBadge";
+import { useDashboardStore } from "@/store/dashboardStore";
+import type { KPI } from "@/store/dashboardStore";
 
 const pendingApplications = [
-  { id: 'APP-001', citizen: 'Ramesh Singh', scheme: 'Kisan Samman Yojana', submitted: '2024-01-15', status: 'pending' },
-  { id: 'APP-002', citizen: 'Sita Devi', scheme: 'PM Awas Yojana', submitted: '2024-01-14', status: 'under_review' },
-  { id: 'APP-003', citizen: 'Mohan Lal', scheme: 'Shiksha Protsahan', submitted: '2024-01-13', status: 'pending' },
-  { id: 'APP-004', citizen: 'Geeta Verma', scheme: 'Kisan Samman Yojana', submitted: '2024-01-12', status: 'info_required' },
-  { id: 'APP-005', citizen: 'Arun Kumar', scheme: 'PM Awas Yojana', submitted: '2024-01-11', status: 'pending' },
+  {
+    id: "APP-001",
+    citizen: "Ramesh Singh",
+    scheme: "Kisan Samman Yojana",
+    submitted: "2024-01-15",
+    status: "pending",
+  },
+  {
+    id: "APP-002",
+    citizen: "Sita Devi",
+    scheme: "PM Awas Yojana",
+    submitted: "2024-01-14",
+    status: "under_review",
+  },
+  {
+    id: "APP-003",
+    citizen: "Mohan Lal",
+    scheme: "Shiksha Protsahan",
+    submitted: "2024-01-13",
+    status: "pending",
+  },
+  {
+    id: "APP-004",
+    citizen: "Geeta Verma",
+    scheme: "Kisan Samman Yojana",
+    submitted: "2024-01-12",
+    status: "info_required",
+  },
+  {
+    id: "APP-005",
+    citizen: "Arun Kumar",
+    scheme: "PM Awas Yojana",
+    submitted: "2024-01-11",
+    status: "pending",
+  },
 ];
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { kpis, trendData, fetchOverview, fetchTrends, loading } = useDashboardStore();
+  const { kpis, trendData, fetchOverview, fetchTrends, loading } =
+    useDashboardStore();
   const theme = useTheme();
   const [refreshing, setRefreshing] = useState(false);
   const [animateKpis, setAnimateKpis] = useState(false);
@@ -58,18 +98,27 @@ export default function Dashboard() {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 3,
+        }}
+      >
         <Box>
-          <Typography variant="h4" sx={{ fontWeight: 700 }}>Dashboard</Typography>
+          <Typography variant="h4" sx={{ fontWeight: 700 }}>
+            Dashboard
+          </Typography>
           <Typography variant="body2" color="text.secondary">
             Real-time overview of GramSathi AI platform
           </Typography>
         </Box>
-        <Box sx={{ display: 'flex', gap: 1 }}>
+        <Box sx={{ display: "flex", gap: 1 }}>
           <Button
             variant="contained"
             startIcon={<AddIcon />}
-            onClick={() => navigate('/schemes/new')}
+            onClick={() => navigate("/schemes/new")}
           >
             New Scheme
           </Button>
@@ -89,7 +138,11 @@ export default function Dashboard() {
               trendDirection={kpi.trendDirection}
               icon={kpi.icon}
               color={kpi.color}
-              onClick={kpi.label === 'Pending Review' ? () => navigate('/applications') : undefined}
+              onClick={
+                kpi.label === "Pending Review"
+                  ? () => navigate("/applications")
+                  : undefined
+              }
             />
           </Grid>
         ))}
@@ -99,28 +152,99 @@ export default function Dashboard() {
         <Grid item xs={12} md={8}>
           <Card sx={{ mb: 2.5 }}>
             <CardContent>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>Application Trends (7 Days)</Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  mb: 2,
+                }}
+              >
+                <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                  Application Trends (7 Days)
+                </Typography>
                 <Chip label="Weekly" size="small" />
               </Box>
               <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={trendData.length > 0 ? trendData : [
-                  { date: 'Mon', applications: 120, approvals: 65, rejections: 12 },
-                  { date: 'Tue', applications: 95, approvals: 72, rejections: 8 },
-                  { date: 'Wed', applications: 145, approvals: 88, rejections: 15 },
-                  { date: 'Thu', applications: 110, approvals: 54, rejections: 10 },
-                  { date: 'Fri', applications: 135, approvals: 92, rejections: 18 },
-                  { date: 'Sat', applications: 85, approvals: 45, rejections: 5 },
-                  { date: 'Sun', applications: 70, approvals: 38, rejections: 3 },
-                ]}>
+                <LineChart
+                  data={
+                    trendData.length > 0
+                      ? trendData
+                      : [
+                          {
+                            date: "Mon",
+                            applications: 120,
+                            approvals: 65,
+                            rejections: 12,
+                          },
+                          {
+                            date: "Tue",
+                            applications: 95,
+                            approvals: 72,
+                            rejections: 8,
+                          },
+                          {
+                            date: "Wed",
+                            applications: 145,
+                            approvals: 88,
+                            rejections: 15,
+                          },
+                          {
+                            date: "Thu",
+                            applications: 110,
+                            approvals: 54,
+                            rejections: 10,
+                          },
+                          {
+                            date: "Fri",
+                            applications: 135,
+                            approvals: 92,
+                            rejections: 18,
+                          },
+                          {
+                            date: "Sat",
+                            applications: 85,
+                            approvals: 45,
+                            rejections: 5,
+                          },
+                          {
+                            date: "Sun",
+                            applications: 70,
+                            approvals: 38,
+                            rejections: 3,
+                          },
+                        ]
+                  }
+                >
                   <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
                   <XAxis dataKey="date" tick={{ fontSize: 12 }} />
                   <YAxis tick={{ fontSize: 12 }} />
                   <Tooltip />
                   <Legend />
-                  <Line type="monotone" dataKey="applications" stroke={theme.palette.primary.main} strokeWidth={2} dot={{ r: 4 }} name="Applications" />
-                  <Line type="monotone" dataKey="approvals" stroke={theme.palette.success.main} strokeWidth={2} dot={{ r: 4 }} name="Approvals" />
-                  <Line type="monotone" dataKey="rejections" stroke={theme.palette.error.main} strokeWidth={2} dot={{ r: 4 }} name="Rejections" />
+                  <Line
+                    type="monotone"
+                    dataKey="applications"
+                    stroke={theme.palette.primary.main}
+                    strokeWidth={2}
+                    dot={{ r: 4 }}
+                    name="Applications"
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="approvals"
+                    stroke={theme.palette.success.main}
+                    strokeWidth={2}
+                    dot={{ r: 4 }}
+                    name="Approvals"
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="rejections"
+                    stroke={theme.palette.error.main}
+                    strokeWidth={2}
+                    dot={{ r: 4 }}
+                    name="Rejections"
+                  />
                 </LineChart>
               </ResponsiveContainer>
             </CardContent>
@@ -128,9 +252,20 @@ export default function Dashboard() {
 
           <Card>
             <CardContent>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>Pending Applications</Typography>
-                <Button size="small" onClick={() => navigate('/applications')}>View All</Button>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  mb: 2,
+                }}
+              >
+                <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                  Pending Applications
+                </Typography>
+                <Button size="small" onClick={() => navigate("/applications")}>
+                  View All
+                </Button>
               </Box>
               <TableContainer>
                 <Table size="small">
@@ -146,16 +281,31 @@ export default function Dashboard() {
                   </TableHead>
                   <TableBody>
                     {pendingApplications.map((app) => (
-                      <TableRow key={app.id} hover sx={{ cursor: 'pointer' }} onClick={() => navigate(`/applications/${app.id}`)}>
+                      <TableRow
+                        key={app.id}
+                        hover
+                        sx={{ cursor: "pointer" }}
+                        onClick={() => navigate(`/applications/${app.id}`)}
+                      >
                         <TableCell>
-                          <Typography variant="body2" sx={{ fontWeight: 500 }}>{app.id}</Typography>
+                          <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                            {app.id}
+                          </Typography>
                         </TableCell>
                         <TableCell>{app.citizen}</TableCell>
                         <TableCell>{app.scheme}</TableCell>
                         <TableCell>{app.submitted}</TableCell>
-                        <TableCell><StatusBadge status={app.status} /></TableCell>
                         <TableCell>
-                          <IconButton size="small" onClick={(e) => { e.stopPropagation(); navigate(`/applications/${app.id}`); }}>
+                          <StatusBadge status={app.status} />
+                        </TableCell>
+                        <TableCell>
+                          <IconButton
+                            size="small"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/applications/${app.id}`);
+                            }}
+                          >
                             <VisibilityIcon fontSize="small" />
                           </IconButton>
                         </TableCell>
@@ -169,7 +319,7 @@ export default function Dashboard() {
         </Grid>
 
         <Grid item xs={12} md={4}>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
             <AIInsightsPanel />
             <GeoHeatMap />
           </Box>

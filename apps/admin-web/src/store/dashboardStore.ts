@@ -1,10 +1,10 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
 export interface KPI {
   label: string;
   value: number;
   trend: number;
-  trendDirection: 'up' | 'down';
+  trendDirection: "up" | "down";
   icon: string;
   color: string;
 }
@@ -14,7 +14,7 @@ export interface RealtimeMetric {
   label: string;
   value: number;
   timestamp: string;
-  type: 'application' | 'grievance' | 'verification';
+  type: "application" | "grievance" | "verification";
 }
 
 export interface TrendPoint {
@@ -45,10 +45,10 @@ interface DashboardState {
 }
 
 const defaultFilters: DashboardFilters = {
-  dateRange: ['', ''],
-  state: '',
-  district: '',
-  scheme: '',
+  dateRange: ["", ""],
+  state: "",
+  district: "",
+  scheme: "",
 };
 
 export const useDashboardStore = create<DashboardState>((set) => ({
@@ -63,10 +63,38 @@ export const useDashboardStore = create<DashboardState>((set) => ({
     await new Promise((r) => setTimeout(r, 600));
     set({
       kpis: [
-        { label: 'Total Applications', value: 2847, trend: 12.5, trendDirection: 'up', icon: 'description', color: '#1565C0' },
-        { label: 'Approved', value: 1892, trend: 8.3, trendDirection: 'up', icon: 'check_circle', color: '#2E7D32' },
-        { label: 'Pending Review', value: 643, trend: -3.2, trendDirection: 'down', icon: 'hourglass_empty', color: '#F57F17' },
-        { label: 'Benefits Disbursed (₹)', value: 12500000, trend: 15.7, trendDirection: 'up', icon: 'account_balance', color: '#0288D1' },
+        {
+          label: "Total Applications",
+          value: 2847,
+          trend: 12.5,
+          trendDirection: "up",
+          icon: "description",
+          color: "#1565C0",
+        },
+        {
+          label: "Approved",
+          value: 1892,
+          trend: 8.3,
+          trendDirection: "up",
+          icon: "check_circle",
+          color: "#2E7D32",
+        },
+        {
+          label: "Pending Review",
+          value: 643,
+          trend: -3.2,
+          trendDirection: "down",
+          icon: "hourglass_empty",
+          color: "#F57F17",
+        },
+        {
+          label: "Benefits Disbursed (₹)",
+          value: 12500000,
+          trend: 15.7,
+          trendDirection: "up",
+          icon: "account_balance",
+          color: "#0288D1",
+        },
       ],
       loading: false,
     });
@@ -76,16 +104,34 @@ export const useDashboardStore = create<DashboardState>((set) => ({
     await new Promise((r) => setTimeout(r, 400));
     set({
       realtimeMetrics: [
-        { id: '1', label: 'New Application', value: 3, timestamp: new Date().toISOString(), type: 'application' },
-        { id: '2', label: 'Grievance Filed', value: 1, timestamp: new Date().toISOString(), type: 'grievance' },
-        { id: '3', label: 'Aadhaar Verified', value: 5, timestamp: new Date().toISOString(), type: 'verification' },
+        {
+          id: "1",
+          label: "New Application",
+          value: 3,
+          timestamp: new Date().toISOString(),
+          type: "application",
+        },
+        {
+          id: "2",
+          label: "Grievance Filed",
+          value: 1,
+          timestamp: new Date().toISOString(),
+          type: "grievance",
+        },
+        {
+          id: "3",
+          label: "Aadhaar Verified",
+          value: 5,
+          timestamp: new Date().toISOString(),
+          type: "verification",
+        },
       ],
     });
   },
 
   fetchTrends: async () => {
     await new Promise((r) => setTimeout(r, 500));
-    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
     set({
       trendData: days.map((day, i) => ({
         date: day,
@@ -96,6 +142,7 @@ export const useDashboardStore = create<DashboardState>((set) => ({
     });
   },
 
-  setFilters: (partial) => set((state) => ({ filters: { ...state.filters, ...partial } })),
+  setFilters: (partial) =>
+    set((state) => ({ filters: { ...state.filters, ...partial } })),
   clearFilters: () => set({ filters: defaultFilters }),
 }));

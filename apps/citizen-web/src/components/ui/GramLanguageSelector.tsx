@@ -1,22 +1,22 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import List from '@mui/material/List';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import TextField from '@mui/material/TextField';
-import InputAdornment from '@mui/material/InputAdornment';
-import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
-import CheckIcon from '@mui/icons-material/Check';
-import SearchIcon from '@mui/icons-material/Search';
-import CloseIcon from '@mui/icons-material/Close';
-import { useAppStore } from '@/store/appStore';
+import { useState } from "react";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import List from "@mui/material/List";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemText from "@mui/material/ListItemText";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import TextField from "@mui/material/TextField";
+import InputAdornment from "@mui/material/InputAdornment";
+import IconButton from "@mui/material/IconButton";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+import CheckIcon from "@mui/icons-material/Check";
+import SearchIcon from "@mui/icons-material/Search";
+import CloseIcon from "@mui/icons-material/Close";
+import { useAppStore } from "@/store/appStore";
 
 interface Language {
   code: string;
@@ -25,28 +25,28 @@ interface Language {
 }
 
 const languages: Language[] = [
-  { code: 'hi', name: 'Hindi', nativeName: 'हिन्दी' },
-  { code: 'mr', name: 'Marathi', nativeName: 'मराठी' },
-  { code: 'ta', name: 'Tamil', nativeName: 'தமிழ்' },
-  { code: 'te', name: 'Telugu', nativeName: 'తెలుగు' },
-  { code: 'bn', name: 'Bengali', nativeName: 'বাংলা' },
-  { code: 'gu', name: 'Gujarati', nativeName: 'ગુજરાતી' },
-  { code: 'kn', name: 'Kannada', nativeName: 'ಕನ್ನಡ' },
-  { code: 'ml', name: 'Malayalam', nativeName: 'മലയാളം' },
-  { code: 'or', name: 'Odia', nativeName: 'ଓଡ଼ିଆ' },
-  { code: 'pa', name: 'Punjabi', nativeName: 'ਪੰਜਾਬੀ' },
-  { code: 'as', name: 'Assamese', nativeName: 'অসমীয়া' },
-  { code: 'mai', name: 'Maithili', nativeName: 'मैथिली' },
-  { code: 'sat', name: 'Santali', nativeName: 'ᱥᱟᱱᱛᱟᱲᱤ' },
-  { code: 'ks', name: 'Kashmiri', nativeName: 'कॉशुर' },
-  { code: 'ne', name: 'Nepali', nativeName: 'नेपाली' },
-  { code: 'sd', name: 'Sindhi', nativeName: 'سنڌي' },
-  { code: 'ur', name: 'Urdu', nativeName: 'اردو' },
-  { code: 'brx', name: 'Bodo', nativeName: 'बर' },
-  { code: 'doi', name: 'Dogri', nativeName: 'डोगरी' },
-  { code: 'mni', name: 'Manipuri', nativeName: 'মৈতৈলোন্' },
-  { code: 'kok', name: 'Konkani', nativeName: 'कोंकणी' },
-  { code: 'en', name: 'English', nativeName: 'English' },
+  { code: "hi", name: "Hindi", nativeName: "हिन्दी" },
+  { code: "mr", name: "Marathi", nativeName: "मराठी" },
+  { code: "ta", name: "Tamil", nativeName: "தமிழ்" },
+  { code: "te", name: "Telugu", nativeName: "తెలుగు" },
+  { code: "bn", name: "Bengali", nativeName: "বাংলা" },
+  { code: "gu", name: "Gujarati", nativeName: "ગુજરાતી" },
+  { code: "kn", name: "Kannada", nativeName: "ಕನ್ನಡ" },
+  { code: "ml", name: "Malayalam", nativeName: "മലയാളം" },
+  { code: "or", name: "Odia", nativeName: "ଓଡ଼ିଆ" },
+  { code: "pa", name: "Punjabi", nativeName: "ਪੰਜਾਬੀ" },
+  { code: "as", name: "Assamese", nativeName: "অসমীয়া" },
+  { code: "mai", name: "Maithili", nativeName: "मैथिली" },
+  { code: "sat", name: "Santali", nativeName: "ᱥᱟᱱᱛᱟᱲᱤ" },
+  { code: "ks", name: "Kashmiri", nativeName: "कॉशुर" },
+  { code: "ne", name: "Nepali", nativeName: "नेपाली" },
+  { code: "sd", name: "Sindhi", nativeName: "سنڌي" },
+  { code: "ur", name: "Urdu", nativeName: "اردو" },
+  { code: "brx", name: "Bodo", nativeName: "बर" },
+  { code: "doi", name: "Dogri", nativeName: "डोगरी" },
+  { code: "mni", name: "Manipuri", nativeName: "মৈতৈলোন্" },
+  { code: "kok", name: "Konkani", nativeName: "कोंकणी" },
+  { code: "en", name: "English", nativeName: "English" },
 ];
 
 interface GramLanguageSelectorProps {
@@ -61,12 +61,12 @@ export default function GramLanguageSelector({
   title,
 }: GramLanguageSelectorProps) {
   const { language, setLanguage } = useAppStore();
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
 
   const filtered = languages.filter(
     (l) =>
       l.name.toLowerCase().includes(search.toLowerCase()) ||
-      l.nativeName.includes(search)
+      l.nativeName.includes(search),
   );
 
   const handleSelect = (code: string) => {
@@ -83,9 +83,21 @@ export default function GramLanguageSelector({
       aria-labelledby="language-selector-title"
     >
       <DialogTitle id="language-selector-title">
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Typography variant="h6">{title || 'common:selectLanguage'}</Typography>
-          <IconButton onClick={onClose} aria-label="Close language selector" size="small">
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Typography variant="h6">
+            {title || "common:selectLanguage"}
+          </Typography>
+          <IconButton
+            onClick={onClose}
+            aria-label="Close language selector"
+            size="small"
+          >
             <CloseIcon />
           </IconButton>
         </Box>
@@ -107,7 +119,11 @@ export default function GramLanguageSelector({
           }}
           aria-label="Search languages"
         />
-        <List sx={{ maxHeight: 400, overflow: 'auto' }} role="listbox" aria-label="Languages">
+        <List
+          sx={{ maxHeight: 400, overflow: "auto" }}
+          role="listbox"
+          aria-label="Languages"
+        >
           {filtered.map((lang) => (
             <ListItemButton
               key={lang.code}
@@ -122,11 +138,11 @@ export default function GramLanguageSelector({
                 secondary={lang.name}
                 primaryTypographyProps={{
                   fontWeight: language === lang.code ? 600 : 400,
-                  fontSize: '1.1rem',
+                  fontSize: "1.1rem",
                 }}
               />
               {language === lang.code && (
-                <ListItemIcon sx={{ minWidth: 'auto' }}>
+                <ListItemIcon sx={{ minWidth: "auto" }}>
                   <CheckIcon color="primary" />
                 </ListItemIcon>
               )}

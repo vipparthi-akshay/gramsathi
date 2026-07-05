@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { useState, useRef, DragEvent } from 'react';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import LinearProgress from '@mui/material/LinearProgress';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import CameraAltIcon from '@mui/icons-material/CameraAlt';
-import PhotoLibraryIcon from '@mui/icons-material/PhotoLibrary';
-import GramButton from '@/components/ui/GramButton';
+import { useState, useRef, DragEvent } from "react";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import LinearProgress from "@mui/material/LinearProgress";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import CameraAltIcon from "@mui/icons-material/CameraAlt";
+import PhotoLibraryIcon from "@mui/icons-material/PhotoLibrary";
+import GramButton from "@/components/ui/GramButton";
 
 interface GramUploadZoneProps {
   onFileSelect: (file: File) => void;
@@ -18,7 +18,7 @@ interface GramUploadZoneProps {
 
 export default function GramUploadZone({
   onFileSelect,
-  accept = 'image/*,.pdf',
+  accept = "image/*,.pdf",
   maxSizeMB = 10,
   disabled = false,
 }: GramUploadZoneProps) {
@@ -34,9 +34,17 @@ export default function GramUploadZone({
       setError(`File size exceeds ${maxSizeMB}MB limit`);
       return false;
     }
-    const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
-    if (!validTypes.includes(file.type) && !file.name.match(/\.(jpg|jpeg|png|webp|pdf)$/i)) {
-      setError('Unsupported file format. Please upload JPG, PNG, or PDF');
+    const validTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+      "application/pdf",
+    ];
+    if (
+      !validTypes.includes(file.type) &&
+      !file.name.match(/\.(jpg|jpeg|png|webp|pdf)$/i)
+    ) {
+      setError("Unsupported file format. Please upload JPG, PNG, or PDF");
       return false;
     }
     return true;
@@ -66,9 +74,9 @@ export default function GramUploadZone({
 
   const handleDrag = (e: DragEvent) => {
     e.preventDefault();
-    if (e.type === 'dragenter' || e.type === 'dragover') {
+    if (e.type === "dragenter" || e.type === "dragover") {
       setIsDragging(true);
-    } else if (e.type === 'dragleave') {
+    } else if (e.type === "dragleave") {
       setIsDragging(false);
     }
   };
@@ -83,7 +91,7 @@ export default function GramUploadZone({
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) handleFile(file);
-    e.target.value = '';
+    e.target.value = "";
   };
 
   return (
@@ -93,21 +101,25 @@ export default function GramUploadZone({
       onDragLeave={handleDrag}
       onDrop={handleDrop}
       sx={{
-        border: '2px dashed',
-        borderColor: isDragging ? 'primary.main' : error ? 'error.main' : 'outline',
+        border: "2px dashed",
+        borderColor: isDragging
+          ? "primary.main"
+          : error
+            ? "error.main"
+            : "outline",
         borderRadius: 4,
         p: 4,
-        textAlign: 'center',
-        backgroundColor: isDragging ? 'action.hover' : 'transparent',
-        transition: 'all 0.2s ease',
-        cursor: disabled ? 'not-allowed' : 'pointer',
+        textAlign: "center",
+        backgroundColor: isDragging ? "action.hover" : "transparent",
+        transition: "all 0.2s ease",
+        cursor: disabled ? "not-allowed" : "pointer",
         opacity: disabled ? 0.6 : 1,
       }}
       role="button"
       tabIndex={0}
       aria-label="Upload document area"
       onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
+        if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
           inputRef.current?.click();
         }
@@ -119,7 +131,7 @@ export default function GramUploadZone({
         type="file"
         accept={accept}
         onChange={handleInput}
-        style={{ display: 'none' }}
+        style={{ display: "none" }}
         aria-hidden="true"
       />
       <input
@@ -128,27 +140,35 @@ export default function GramUploadZone({
         accept="image/*"
         capture="environment"
         onChange={handleInput}
-        style={{ display: 'none' }}
+        style={{ display: "none" }}
         aria-hidden="true"
       />
 
       {uploading ? (
-        <Box sx={{ width: '100%' }}>
+        <Box sx={{ width: "100%" }}>
           <Typography variant="body2" color="text.secondary" gutterBottom>
             Uploading... {progress}%
           </Typography>
-          <LinearProgress variant="determinate" value={progress} sx={{ borderRadius: 4 }} />
+          <LinearProgress
+            variant="determinate"
+            value={progress}
+            sx={{ borderRadius: 4 }}
+          />
         </Box>
       ) : (
         <>
-          <CloudUploadIcon sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />
+          <CloudUploadIcon
+            sx={{ fontSize: 48, color: "primary.main", mb: 1 }}
+          />
           <Typography variant="body1" fontWeight={500} gutterBottom>
             Drag & drop or tap to upload
           </Typography>
           <Typography variant="body2" color="text.secondary" gutterBottom>
             Supported: JPG, PNG, PDF (max {maxSizeMB}MB)
           </Typography>
-          <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', mt: 2 }}>
+          <Box
+            sx={{ display: "flex", gap: 2, justifyContent: "center", mt: 2 }}
+          >
             <GramButton
               variant="tonal"
               size="small"

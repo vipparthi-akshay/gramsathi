@@ -1,36 +1,39 @@
-'use client';
+"use client";
 
-import { ReactNode, MouseEvent, KeyboardEvent } from 'react';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import CardActions from '@mui/material/CardActions';
-import CardMedia from '@mui/material/CardMedia';
-import CardActionArea from '@mui/material/CardActionArea';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
-import Avatar from '@mui/material/Avatar';
-import { styled } from '@mui/material/styles';
+import { ReactNode, MouseEvent, KeyboardEvent } from "react";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import CardActions from "@mui/material/CardActions";
+import CardMedia from "@mui/material/CardMedia";
+import CardActionArea from "@mui/material/CardActionArea";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+import Avatar from "@mui/material/Avatar";
+import { styled } from "@mui/material/styles";
 
 const StyledCard = styled(Card)(({ theme }) => ({
   borderRadius: 16,
-  transition: 'box-shadow 0.2s ease, transform 0.2s ease',
-  '&:hover': {
-    transform: 'translateY(-2px)',
+  transition: "box-shadow 0.2s ease, transform 0.2s ease",
+  "&:hover": {
+    transform: "translateY(-2px)",
   },
-  '&.clickable': {
-    cursor: 'pointer',
+  "&.clickable": {
+    cursor: "pointer",
   },
-  '&.elevation-0': {
-    boxShadow: 'none',
+  "&.elevation-0": {
+    boxShadow: "none",
   },
-  '&.elevation-1': {
-    boxShadow: '0px 1px 3px 1px rgba(0,0,0,0.15), 0px 1px 2px 0px rgba(0,0,0,0.30)',
+  "&.elevation-1": {
+    boxShadow:
+      "0px 1px 3px 1px rgba(0,0,0,0.15), 0px 1px 2px 0px rgba(0,0,0,0.30)",
   },
-  '&.elevation-2': {
-    boxShadow: '0px 2px 6px 2px rgba(0,0,0,0.15), 0px 1px 2px 0px rgba(0,0,0,0.30)',
+  "&.elevation-2": {
+    boxShadow:
+      "0px 2px 6px 2px rgba(0,0,0,0.15), 0px 1px 2px 0px rgba(0,0,0,0.30)",
   },
-  '&.elevation-3': {
-    boxShadow: '0px 4px 8px 3px rgba(0,0,0,0.15), 0px 1px 3px 0px rgba(0,0,0,0.30)',
+  "&.elevation-3": {
+    boxShadow:
+      "0px 4px 8px 3px rgba(0,0,0,0.15), 0px 1px 3px 0px rgba(0,0,0,0.30)",
   },
 }));
 
@@ -73,7 +76,7 @@ export default function GramCard({
   };
 
   const handleKeyDown = (e: KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
+    if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       onClick?.();
     }
@@ -81,25 +84,32 @@ export default function GramCard({
 
   const content = (
     <>
-      {(image || media) && (
-        media || (
+      {(image || media) &&
+        (media || (
           <CardMedia
             component="img"
             height="160"
             image={image}
-            alt={title || ''}
-            sx={{ objectFit: 'cover' }}
+            alt={title || ""}
+            sx={{ objectFit: "cover" }}
           />
-        )
-      )}
+        ))}
       <CardContent sx={{ pb: actions ? 1 : 2 }}>
         {(avatar || icon) && (
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5, gap: 1.5 }}>
-            {avatar && typeof avatar === 'string' ? (
-              <Avatar src={avatar} alt={title || ''} sx={{ width: 40, height: 40 }} />
-            ) : avatar}
+          <Box
+            sx={{ display: "flex", alignItems: "center", mb: 1.5, gap: 1.5 }}
+          >
+            {avatar && typeof avatar === "string" ? (
+              <Avatar
+                src={avatar}
+                alt={title || ""}
+                sx={{ width: 40, height: 40 }}
+              />
+            ) : (
+              avatar
+            )}
             {icon && (
-              <Box sx={{ color: 'primary.main', display: 'flex' }}>{icon}</Box>
+              <Box sx={{ color: "primary.main", display: "flex" }}>{icon}</Box>
             )}
           </Box>
         )}
@@ -121,16 +131,14 @@ export default function GramCard({
         {children}
       </CardContent>
       {actions && (
-        <CardActions sx={{ px: 2, pb: 2, gap: 1 }}>
-          {actions}
-        </CardActions>
+        <CardActions sx={{ px: 2, pb: 2, gap: 1 }}>{actions}</CardActions>
       )}
     </>
   );
 
   return (
     <StyledCard
-      className={`elevation-${elevation} ${actionArea ? 'clickable' : ''} ${className || ''}`}
+      className={`elevation-${elevation} ${actionArea ? "clickable" : ""} ${className || ""}`}
       aria-label={ariaLabel}
     >
       {actionArea ? (

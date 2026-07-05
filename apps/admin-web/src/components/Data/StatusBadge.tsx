@@ -1,15 +1,15 @@
-import { Chip } from '@mui/material';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CancelIcon from '@mui/icons-material/Cancel';
-import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
-import ErrorIcon from '@mui/icons-material/Error';
-import FlagIcon from '@mui/icons-material/Flag';
-import NewReleasesIcon from '@mui/icons-material/NewReleases';
-import { statusColors } from '@/theme/theme';
+import { Chip } from "@mui/material";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CancelIcon from "@mui/icons-material/Cancel";
+import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
+import ErrorIcon from "@mui/icons-material/Error";
+import FlagIcon from "@mui/icons-material/Flag";
+import NewReleasesIcon from "@mui/icons-material/NewReleases";
+import { statusColors } from "@/theme/theme";
 
 interface StatusBadgeProps {
   status: string;
-  size?: 'small' | 'medium';
+  size?: "small" | "medium";
 }
 
 const statusIcons: Record<string, React.ReactElement> = {
@@ -28,13 +28,14 @@ const statusIcons: Record<string, React.ReactElement> = {
 };
 
 function formatLabel(status: string): string {
-  return status
-    .replace(/_/g, ' ')
-    .replace(/\b\w/g, (c) => c.toUpperCase());
+  return status.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-export default function StatusBadge({ status, size = 'small' }: StatusBadgeProps) {
-  const color = statusColors[status] || '#5A5A7A';
+export default function StatusBadge({
+  status,
+  size = "small",
+}: StatusBadgeProps) {
+  const color = statusColors[status] || "#5A5A7A";
 
   return (
     <Chip
@@ -46,7 +47,10 @@ export default function StatusBadge({ status, size = 'small' }: StatusBadgeProps
         color: color,
         fontWeight: 500,
         border: `1px solid ${color}40`,
-        '& .MuiChip-icon': { color: color, fontSize: size === 'small' ? 16 : 20 },
+        "& .MuiChip-icon": {
+          color: color,
+          fontSize: size === "small" ? 16 : 20,
+        },
       }}
     />
   );

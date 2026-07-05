@@ -1,13 +1,13 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 export interface Message {
   id: string;
-  role: 'user' | 'assistant' | 'system';
+  role: "user" | "assistant" | "system";
   content: string;
   timestamp: number;
   language: string;
-  type: 'text' | 'voice' | 'document' | 'image';
+  type: "text" | "voice" | "document" | "image";
   metadata?: Record<string, any>;
 }
 
@@ -48,7 +48,7 @@ export const useChatStore = create<ChatState>()(
         const id = `conv_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         const conv: Conversation = {
           id,
-          title: '',
+          title: "",
           language,
           messages: [],
           createdAt: Date.now(),
@@ -66,7 +66,9 @@ export const useChatStore = create<ChatState>()(
         set((state) => ({
           conversations: state.conversations.filter((c) => c.id !== id),
           activeConversationId:
-            state.activeConversationId === id ? null : state.activeConversationId,
+            state.activeConversationId === id
+              ? null
+              : state.activeConversationId,
         })),
 
       setActiveConversation: (id) => set({ activeConversationId: id }),
@@ -79,9 +81,13 @@ export const useChatStore = create<ChatState>()(
                   ...c,
                   messages: [...c.messages, message],
                   updatedAt: Date.now(),
-                  title: c.title || (message.role === 'user' ? message.content.slice(0, 60) : ''),
+                  title:
+                    c.title ||
+                    (message.role === "user"
+                      ? message.content.slice(0, 60)
+                      : ""),
                 }
-              : c
+              : c,
           ),
         })),
 
@@ -90,11 +96,11 @@ export const useChatStore = create<ChatState>()(
       clearActive: () => set({ activeConversationId: null }),
     }),
     {
-      name: 'gramsathi-chat',
+      name: "gramsathi-chat",
       partialize: (state) => ({
         conversations: state.conversations,
         activeConversationId: state.activeConversationId,
       }),
-    }
-  )
+    },
+  ),
 );

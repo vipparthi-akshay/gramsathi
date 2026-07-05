@@ -1,5 +1,5 @@
-import api from './api';
-import type { ApiResponse } from './api';
+import api from "./api";
+import type { ApiResponse } from "./api";
 
 export interface OverviewData {
   totalApplications: number;
@@ -25,16 +25,25 @@ export interface TrendData {
 }
 
 export async function getOverview(): Promise<OverviewData> {
-  const { data } = await api.get<ApiResponse<OverviewData>>('/dashboard/overview');
+  const { data } = await api.get<ApiResponse<OverviewData>>(
+    "/dashboard/overview",
+  );
   return data.data;
 }
 
 export async function getRealtime(): Promise<RealtimeData> {
-  const { data } = await api.get<ApiResponse<RealtimeData>>('/dashboard/realtime');
+  const { data } = await api.get<ApiResponse<RealtimeData>>(
+    "/dashboard/realtime",
+  );
   return data.data;
 }
 
-export async function getTrends(params?: { days?: number }): Promise<TrendData[]> {
-  const { data } = await api.get<ApiResponse<TrendData[]>>('/dashboard/trends', { params });
+export async function getTrends(params?: {
+  days?: number;
+}): Promise<TrendData[]> {
+  const { data } = await api.get<ApiResponse<TrendData[]>>(
+    "/dashboard/trends",
+    { params },
+  );
   return data.data;
 }

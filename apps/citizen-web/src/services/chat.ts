@@ -1,4 +1,4 @@
-import api from './api';
+import api from "./api";
 
 export interface ChatResponse {
   message: string;
@@ -12,9 +12,9 @@ export const chatApi = {
   sendMessage: async (
     text: string,
     language: string,
-    conversationId?: string
+    conversationId?: string,
   ): Promise<ChatResponse> => {
-    const { data } = await api.post('/chat/message', {
+    const { data } = await api.post("/chat/message", {
       text,
       language,
       conversationId,
@@ -25,14 +25,14 @@ export const chatApi = {
   sendVoiceMessage: async (
     audioBlob: Blob,
     language: string,
-    conversationId?: string
+    conversationId?: string,
   ): Promise<ChatResponse> => {
     const formData = new FormData();
-    formData.append('audio', audioBlob, 'recording.webm');
-    formData.append('language', language);
-    if (conversationId) formData.append('conversationId', conversationId);
-    const { data } = await api.post('/chat/voice', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    formData.append("audio", audioBlob, "recording.webm");
+    formData.append("language", language);
+    if (conversationId) formData.append("conversationId", conversationId);
+    const { data } = await api.post("/chat/voice", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
     });
     return data;
   },
@@ -43,7 +43,7 @@ export const chatApi = {
   },
 
   getConversations: async () => {
-    const { data } = await api.get('/chat/conversations');
+    const { data } = await api.get("/chat/conversations");
     return data;
   },
 
@@ -52,7 +52,7 @@ export const chatApi = {
   },
 
   getSuggestions: async (query: string, language: string) => {
-    const { data } = await api.get('/chat/suggestions', {
+    const { data } = await api.get("/chat/suggestions", {
       params: { query, language },
     });
     return data;

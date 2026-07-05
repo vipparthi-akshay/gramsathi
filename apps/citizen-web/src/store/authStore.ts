@@ -1,5 +1,5 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 export interface User {
   id: string;
@@ -63,12 +63,12 @@ export const useAuthStore = create<AuthState>()(
       setError: (error) => set({ error }),
     }),
     {
-      name: 'gramsathi-auth',
+      name: "gramsathi-auth",
       partialize: (state) => ({
         user: state.user,
         token: state.token,
         isAuthenticated: state.isAuthenticated,
       }),
-    }
-  )
+    },
+  ),
 );

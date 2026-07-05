@@ -1,8 +1,9 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
-export type AccessibilityMode = 'normal' | 'highContrast' | 'largeText' | 'voiceOnly';
-export type InputMode = 'voice' | 'text' | 'hybrid';
+export type AccessibilityMode =
+  "normal" | "highContrast" | "largeText" | "voiceOnly";
+export type InputMode = "voice" | "text" | "hybrid";
 
 interface AppState {
   language: string;
@@ -22,10 +23,10 @@ interface AppState {
 export const useAppStore = create<AppState>()(
   persist(
     (set) => ({
-      language: 'en',
-      dialect: '',
-      preferredInputMode: 'hybrid',
-      accessibilityMode: 'normal',
+      language: "en",
+      dialect: "",
+      preferredInputMode: "hybrid",
+      accessibilityMode: "normal",
       onboardingComplete: false,
       fontScale: 1,
 
@@ -33,11 +34,12 @@ export const useAppStore = create<AppState>()(
       setDialect: (dialect) => set({ dialect }),
       setPreferredInputMode: (mode) => set({ preferredInputMode: mode }),
       setAccessibilityMode: (mode) => set({ accessibilityMode: mode }),
-      setOnboardingComplete: (complete) => set({ onboardingComplete: complete }),
+      setOnboardingComplete: (complete) =>
+        set({ onboardingComplete: complete }),
       setFontScale: (scale) => set({ fontScale: scale }),
     }),
     {
-      name: 'gramsathi-app',
-    }
-  )
+      name: "gramsathi-app",
+    },
+  ),
 );

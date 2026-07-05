@@ -1,11 +1,17 @@
-import api from './api';
+import api from "./api";
 
 export interface Application {
   id: string;
   schemeId: string;
   schemeName: string;
   schemeNameLocal: string;
-  status: 'draft' | 'submitted' | 'under_review' | 'approved' | 'rejected' | 'cancelled';
+  status:
+    | "draft"
+    | "submitted"
+    | "under_review"
+    | "approved"
+    | "rejected"
+    | "cancelled";
   applicationData: Record<string, any>;
   documents: string[];
   progress: number;
@@ -24,13 +30,23 @@ export interface ApplicationTimeline {
 }
 
 export const applicationApi = {
-  createApplication: async (schemeId: string, data?: Record<string, any>): Promise<Application> => {
-    const { data: res } = await api.post('/applications', { schemeId, applicationData: data });
+  createApplication: async (
+    schemeId: string,
+    data?: Record<string, any>,
+  ): Promise<Application> => {
+    const { data: res } = await api.post("/applications", {
+      schemeId,
+      applicationData: data,
+    });
     return res;
   },
 
-  getApplications: async (filters?: { status?: string; page?: number; limit?: number }) => {
-    const { data } = await api.get('/applications', { params: filters });
+  getApplications: async (filters?: {
+    status?: string;
+    page?: number;
+    limit?: number;
+  }) => {
+    const { data } = await api.get("/applications", { params: filters });
     return data;
   },
 
@@ -39,7 +55,10 @@ export const applicationApi = {
     return data;
   },
 
-  updateApplication: async (id: string, applicationData: Record<string, any>): Promise<Application> => {
+  updateApplication: async (
+    id: string,
+    applicationData: Record<string, any>,
+  ): Promise<Application> => {
     const { data } = await api.put(`/applications/${id}`, { applicationData });
     return data;
   },

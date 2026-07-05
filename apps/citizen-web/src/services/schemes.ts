@@ -1,4 +1,4 @@
-import api from './api';
+import api from "./api";
 
 export interface Scheme {
   id: string;
@@ -16,7 +16,7 @@ export interface Scheme {
   applicationCount?: number;
   budget?: string;
   howToApply: string;
-  status: 'active' | 'closed' | 'coming_soon';
+  status: "active" | "closed" | "coming_soon";
   createdAt: string;
   updatedAt: string;
 }
@@ -25,14 +25,14 @@ export interface SchemeFilters {
   category?: string;
   search?: string;
   status?: string;
-  sortBy?: 'match' | 'deadline' | 'name' | 'popularity';
+  sortBy?: "match" | "deadline" | "name" | "popularity";
   page?: number;
   limit?: number;
 }
 
 export const schemeApi = {
   getSchemes: async (filters: SchemeFilters = {}) => {
-    const { data } = await api.get('/schemes', { params: filters });
+    const { data } = await api.get("/schemes", { params: filters });
     return data;
   },
 
@@ -42,7 +42,7 @@ export const schemeApi = {
   },
 
   getMatchedSchemes: async () => {
-    const { data } = await api.get('/schemes/matched');
+    const { data } = await api.get("/schemes/matched");
     return data;
   },
 
@@ -52,12 +52,12 @@ export const schemeApi = {
   },
 
   getCategories: async () => {
-    const { data } = await api.get('/schemes/categories');
+    const { data } = await api.get("/schemes/categories");
     return data;
   },
 
   searchSchemes: async (query: string, language: string) => {
-    const { data } = await api.get('/schemes/search', {
+    const { data } = await api.get("/schemes/search", {
       params: { query, language },
     });
     return data;
