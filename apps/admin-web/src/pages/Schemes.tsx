@@ -102,7 +102,7 @@ export default function Schemes() {
   const navigate = useNavigate();
   const { filters, setFilter, clearFilters } = useFilters();
   const debouncedSearch = useDebounce(filters.search);
-  const pagination = usePagination(10);
+  const { page, limit, total, setTotal, setPage, setLimit } = usePagination(10);
   const [schemes, setSchemes] = useState<Scheme[]>([]);
   const [deleteDialog, setDeleteDialog] = useState<Scheme | null>(null);
 
@@ -118,10 +118,10 @@ export default function Schemes() {
     if (filters.status) {
       filtered = filtered.filter((s) => filters.status === 'active' ? s.isActive : !s.isActive);
     }
-    pagination.setTotal(filtered.length);
-    const start = (pagination.page - 1) * pagination.limit;
-    setSchemes(filtered.slice(start, start + pagination.limit));
-  }, [debouncedSearch, filters.category, filters.status, pagination.page, pagination.limit]);
+    setTotal(filtered.length);
+    const start = (page - 1) * limit;
+    setSchemes(filtered.slice(start, start + limit));
+  }, [debouncedSearch, filters.category, filters.status, page, limit, setTotal]);
 
   const handleToggleActive = (scheme: Scheme) => {
     setSchemes((prev) => prev.map((s) => s.id === scheme.id ? { ...s, isActive: !s.isActive } : s));
@@ -179,11 +179,11 @@ export default function Schemes() {
           ]}
           data={schemes}
           keyExtractor={(row) => row.id}
-          total={pagination.total}
-          page={pagination.page}
-          limit={pagination.limit}
-          onPageChange={pagination.setPage}
-          onLimitChange={pagination.setLimit}
+          total={total}
+          page={page}
+          limit={limit}
+          onPageChange={setPage}
+          onLimitChange={setLimit}
           actions={(row: Scheme) => (
             <Box sx={{ display: 'flex', gap: 0.5 }}>
               <Tooltip title="Edit"><IconButton size="small" onClick={() => navigate(`/schemes/${row.id}/edit`)}><EditIcon fontSize="small" /></IconButton></Tooltip>

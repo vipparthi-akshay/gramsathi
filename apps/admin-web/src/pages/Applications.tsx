@@ -53,7 +53,7 @@ export default function Applications() {
   const navigate = useNavigate();
   const { filters, setFilter, clearFilters } = useFilters();
   const debouncedSearch = useDebounce(filters.search);
-  const pagination = usePagination(10);
+  const { page, limit, total, setTotal, setPage, setLimit } = usePagination(10);
   const [activeTab, setActiveTab] = useState('');
   const [applications, setApplications] = useState<Application[]>([]);
   const [selected, setSelected] = useState<string[]>([]);
@@ -73,10 +73,10 @@ export default function Applications() {
     if (filters.status) {
       filtered = filtered.filter((a) => a.status === filters.status);
     }
-    pagination.setTotal(filtered.length);
-    const start = (pagination.page - 1) * pagination.limit;
-    setApplications(filtered.slice(start, start + pagination.limit));
-  }, [activeTab, debouncedSearch, filters.status, pagination.page, pagination.limit]);
+    setTotal(filtered.length);
+    const start = (page - 1) * limit;
+    setApplications(filtered.slice(start, start + limit));
+  }, [activeTab, debouncedSearch, filters.status, page, limit, setTotal]);
 
   const handleBulkApprove = () => {
     setBulkDialog(true);
@@ -129,7 +129,7 @@ export default function Applications() {
 
       <Tabs
         value={activeTab}
-        onChange={(_, v) => { setActiveTab(v); pagination.setPage(1); }}
+        onChange={(_, v) => { setActiveTab(v); setPage(1); }}
         sx={{ mb: 2, borderBottom: 1, borderColor: 'divider' }}
       >
         {tabs.map((tab) => <Tab key={tab.value} label={tab.label} value={tab.value} />)}
@@ -158,11 +158,11 @@ export default function Applications() {
           ]}
           data={applications}
           keyExtractor={(row) => row.id}
-          total={pagination.total}
-          page={pagination.page}
-          limit={pagination.limit}
-          onPageChange={pagination.setPage}
-          onLimitChange={pagination.setLimit}
+          total={total}
+          page={page}
+          limit={limit}
+          onPageChange={setPage}
+          onLimitChange={setLimit}
           selectable
           selected={selected}
           onSelectionChange={setSelected}

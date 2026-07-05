@@ -11,6 +11,7 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import IconButton from '@mui/material/IconButton';
+import Image from 'next/image';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
 import PhoneIphoneIcon from '@mui/icons-material/PhoneIphone';
@@ -119,7 +120,7 @@ export default function LoginPage() {
               backdropFilter: 'blur(10px)',
               border: '1px solid rgba(255,255,255,0.3)'
             }}>
-              <img src="/logo.png" alt="GramSathi AI Logo" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '16px' }} />
+              <Image src="/logo.png" alt="GramSathi AI Logo" width={80} height={80} style={{ objectFit: 'cover', borderRadius: '16px' }} />
             </Box>
             <Typography variant="h4" fontWeight={700} color="white" sx={{ mb: 1 }}>
               {t('common.appName', 'GramSathi AI')}

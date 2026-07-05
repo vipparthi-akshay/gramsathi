@@ -78,7 +78,7 @@ export default function SchemeForm() {
       benefits: benefits.filter((b) => b.trim()),
       eligibilityCriteria: Object.fromEntries(criteriaEntries.filter((e) => e.key && e.value).map((e) => [e.key, e.value])),
     };
-    console.log('Submit:', finalForm);
+    // console.log('Submit:', finalForm);
     navigate('/schemes');
   };
 

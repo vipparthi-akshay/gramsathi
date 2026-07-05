@@ -58,6 +58,7 @@ export default function GramFloatingAssistant() {
       };
       setMessages([welcome]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSend = (text: string) => {

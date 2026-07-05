@@ -63,7 +63,7 @@ export default function Grievances() {
   const navigate = useNavigate();
   const { filters, setFilter, clearFilters } = useFilters();
   const debouncedSearch = useDebounce(filters.search);
-  const pagination = usePagination(10);
+  const { page, limit, total, setTotal, setPage, setLimit } = usePagination(10);
   const [activeTab, setActiveTab] = useState('');
   const [grievances, setGrievances] = useState<Grievance[]>([]);
   const [assignMenu, setAssignMenu] = useState<{ anchor: HTMLElement; grievance: Grievance } | null>(null);
@@ -76,10 +76,10 @@ export default function Grievances() {
       filtered = filtered.filter((g) => g.citizenName.toLowerCase().includes(q) || g.id.toLowerCase().includes(q) || g.category.toLowerCase().includes(q));
     }
     if (filters.department) filtered = filtered.filter((g) => g.department.toLowerCase().includes(filters.department.toLowerCase()));
-    pagination.setTotal(filtered.length);
-    const start = (pagination.page - 1) * pagination.limit;
-    setGrievances(filtered.slice(start, start + pagination.limit));
-  }, [activeTab, debouncedSearch, filters.department, pagination.page, pagination.limit]);
+    setTotal(filtered.length);
+    const start = (page - 1) * limit;
+    setGrievances(filtered.slice(start, start + limit));
+  }, [activeTab, debouncedSearch, filters.department, page, limit, setTotal]);
 
   const handleAssign = (officer: string) => {
     if (!assignMenu) return;
@@ -100,7 +100,7 @@ export default function Grievances() {
         </Box>
       </Box>
 
-      <Tabs value={activeTab} onChange={(_, v) => { setActiveTab(v); pagination.setPage(1); }} sx={{ mb: 2, borderBottom: 1, borderColor: 'divider' }}>
+      <Tabs value={activeTab} onChange={(_, v) => { setActiveTab(v); setPage(1); }} sx={{ mb: 2, borderBottom: 1, borderColor: 'divider' }}>
         {tabs.map((tab) => <Tab key={tab.value} label={tab.label} value={tab.value} />)}
       </Tabs>
 
@@ -131,11 +131,11 @@ export default function Grievances() {
           ]}
           data={grievances}
           keyExtractor={(row) => row.id}
-          total={pagination.total}
-          page={pagination.page}
-          limit={pagination.limit}
-          onPageChange={pagination.setPage}
-          onLimitChange={pagination.setLimit}
+          total={total}
+          page={page}
+          limit={limit}
+          onPageChange={setPage}
+          onLimitChange={setLimit}
           actions={(row: Grievance) => (
             <Box sx={{ display: 'flex', gap: 0.5 }}>
               <Tooltip title="View"><IconButton size="small" onClick={() => navigate(`/grievances/${row.id}`)}><VisibilityIcon fontSize="small" /></IconButton></Tooltip>

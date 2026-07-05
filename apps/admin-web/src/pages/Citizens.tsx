@@ -47,7 +47,7 @@ export default function Citizens() {
   const navigate = useNavigate();
   const { filters, setFilter, clearFilters } = useFilters();
   const debouncedSearch = useDebounce(filters.search);
-  const pagination = usePagination(10);
+  const { page, limit, total, setTotal, setPage, setLimit } = usePagination(10);
   const [citizens, setCitizens] = useState<Citizen[]>([]);
 
   useEffect(() => {
@@ -64,10 +64,10 @@ export default function Citizens() {
     if (filters.state) filtered = filtered.filter((c) => c.state === filters.state);
     if (filters.district) filtered = filtered.filter((c) => c.district.toLowerCase().includes(filters.district.toLowerCase()));
     if (filters.status) filtered = filtered.filter((c) => filters.status === 'verified' ? c.isVerified : !c.isVerified);
-    pagination.setTotal(filtered.length);
-    const start = (pagination.page - 1) * pagination.limit;
-    setCitizens(filtered.slice(start, start + pagination.limit));
-  }, [debouncedSearch, filters.state, filters.district, filters.status, pagination.page, pagination.limit]);
+    setTotal(filtered.length);
+    const start = (page - 1) * limit;
+    setCitizens(filtered.slice(start, start + limit));
+  }, [debouncedSearch, filters.state, filters.district, filters.status, page, limit, setTotal]);
 
   const handleVerify = (id: string) => {
     setCitizens((prev) => prev.map((c) => c.id === id ? { ...c, isVerified: true } : c));
@@ -115,11 +115,11 @@ export default function Citizens() {
           ]}
           data={citizens}
           keyExtractor={(row) => row.id}
-          total={pagination.total}
-          page={pagination.page}
-          limit={pagination.limit}
-          onPageChange={pagination.setPage}
-          onLimitChange={pagination.setLimit}
+          total={total}
+          page={page}
+          limit={limit}
+          onPageChange={setPage}
+          onLimitChange={setLimit}
           actions={(row: Citizen) => (
             <Box sx={{ display: 'flex', gap: 0.5 }}>
               <Tooltip title="View Profile"><IconButton size="small" onClick={() => navigate(`/citizens/${row.id}`)}><VisibilityIcon fontSize="small" /></IconButton></Tooltip>

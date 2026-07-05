@@ -42,7 +42,7 @@ const allPermissions = ['manage_schemes', 'manage_users', 'view_analytics', 'pro
 export default function Users() {
   const { filters, setFilter, clearFilters } = useFilters();
   const debouncedSearch = useDebounce(filters.search);
-  const pagination = usePagination(10);
+  const { page, limit, total, setTotal, setPage, setLimit } = usePagination(10);
   const [users, setUsers] = useState<SystemUser[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editUser, setEditUser] = useState<SystemUser | null>(null);
@@ -57,10 +57,10 @@ export default function Users() {
     }
     if (filters.role) filtered = filtered.filter((u) => u.role === filters.role);
     if (filters.status) filtered = filtered.filter((u) => filters.status === 'active' ? u.isActive : !u.isActive);
-    pagination.setTotal(filtered.length);
-    const start = (pagination.page - 1) * pagination.limit;
-    setUsers(filtered.slice(start, start + pagination.limit));
-  }, [debouncedSearch, filters.role, filters.status, pagination.page, pagination.limit]);
+    setTotal(filtered.length);
+    const start = (page - 1) * limit;
+    setUsers(filtered.slice(start, start + limit));
+  }, [debouncedSearch, filters.role, filters.status, page, limit, setTotal]);
 
   const handleOpenCreate = () => {
     setEditUser(null);
@@ -132,11 +132,11 @@ export default function Users() {
           ]}
           data={users}
           keyExtractor={(row) => row.id}
-          total={pagination.total}
-          page={pagination.page}
-          limit={pagination.limit}
-          onPageChange={pagination.setPage}
-          onLimitChange={pagination.setLimit}
+          total={total}
+          page={page}
+          limit={limit}
+          onPageChange={setPage}
+          onLimitChange={setLimit}
           actions={(row: SystemUser) => (
             <Box sx={{ display: 'flex', gap: 0.5 }}>
               <Tooltip title="Edit"><IconButton size="small" onClick={() => handleOpenEdit(row)}><EditIcon fontSize="small" /></IconButton></Tooltip>

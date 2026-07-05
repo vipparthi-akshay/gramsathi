@@ -21,7 +21,7 @@ api.interceptors.request.use(
       try {
         const user = JSON.parse(userStr);
         config.headers['X-User-Role'] = user.role;
-      } catch { }
+      } catch { /* invalid JSON, skip */ }
     }
     return config;
   },

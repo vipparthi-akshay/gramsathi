@@ -12,6 +12,20 @@ import { styled, keyframes } from '@mui/material/styles';
 declare var SpeechRecognition: any;
 declare var webkitSpeechRecognition: any;
 
+const langMap: Record<string, string> = {
+  hi: 'hi-IN',
+  mr: 'mr-IN',
+  ta: 'ta-IN',
+  te: 'te-IN',
+  bn: 'bn-IN',
+  gu: 'gu-IN',
+  kn: 'kn-IN',
+  ml: 'ml-IN',
+  or: 'or-IN',
+  pa: 'pa-IN',
+  en: 'en-US',
+};
+
 const pulse = keyframes`
   0% { transform: scale(1); opacity: 0.8; }
   50% { transform: scale(1.2); opacity: 0.4; }
@@ -69,20 +83,6 @@ export default function GramVoiceInput({
   const [isProcessing, setIsProcessing] = useState(false);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const recognitionRef = useRef<any>(null);
-
-  const langMap: Record<string, string> = {
-    hi: 'hi-IN',
-    mr: 'mr-IN',
-    ta: 'ta-IN',
-    te: 'te-IN',
-    bn: 'bn-IN',
-    gu: 'gu-IN',
-    kn: 'kn-IN',
-    ml: 'ml-IN',
-    or: 'or-IN',
-    pa: 'pa-IN',
-    en: 'en-US',
-  };
 
   const startRecording = useCallback(() => {
     if (!('webkitSpeechRecognition' in (window as any) || 'SpeechRecognition' in (window as any))) {

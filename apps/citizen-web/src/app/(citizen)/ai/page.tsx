@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
@@ -12,6 +12,7 @@ import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemIcon from '@mui/material/ListItemIcon';
+import Image from 'next/image';
 import SendIcon from '@mui/icons-material/Send';
 import MicIcon from '@mui/icons-material/Mic';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
@@ -60,7 +61,7 @@ export default function AIPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const activeConv = conversations.find((c) => c.id === activeConversationId);
-  const currentMessages = activeConv?.messages || [];
+  const currentMessages = useMemo(() => activeConv?.messages || [], [activeConv?.messages]);
 
   useEffect(() => {
     if (!activeConversationId) {
@@ -167,7 +168,7 @@ export default function AIPage() {
             <MenuIcon />
           </IconButton>
           <Box sx={{ width: 32, height: 32, borderRadius: 2, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <img src="/logo.png" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <Image src="/logo.png" alt="Logo" width={32} height={32} style={{ objectFit: 'cover' }} />
           </Box>
           <Typography variant="h6" fontWeight={700} sx={{ flex: 1, background: 'linear-gradient(135deg, #1565C0, #0D47A1)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
             {t('ai.gramBot', 'GramBot')}
@@ -223,7 +224,7 @@ export default function AIPage() {
               {isTyping && (
                 <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', ml: 1, mt: 1 }}>
                   <Box sx={{ width: 24, height: 24, borderRadius: 1, overflow: 'hidden' }}>
-                    <img src="/logo.png" alt="Bot" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <Image src="/logo.png" alt="Bot" width={24} height={24} style={{ objectFit: 'cover' }} />
                   </Box>
                   <Typography variant="body2" color="text.secondary" fontStyle="italic">
                     {t('ai.aiThinking', 'GramBot is thinking...')}
