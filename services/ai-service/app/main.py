@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="GramSathi AI Service",
-    description="AI-powered multilingual assistant for Indian government scheme discovery, application help, and document processing",
+    description="AI-powered multilingual assistant for Indian government scheme discovery and document processing",
     version="1.0.0",
 )
 

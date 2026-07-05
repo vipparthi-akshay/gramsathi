@@ -1,4 +1,6 @@
-SCHEME_RANK_PROMPT = """You are a scheme ranking assistant that helps match Indian citizens to the most relevant government welfare schemes.
+SCHEME_RANK_PROMPT = """\
+You are a scheme ranking assistant that helps match Indian citizens \
+to the most relevant government welfare schemes.
 
 ## Citizen Profile
 - Name: {citizen_name}
@@ -48,7 +50,9 @@ Return a JSON array ranked by relevance (most relevant first). Each element:
 ```
 
 ## Language Guidelines
-For the relevance_reason field, use very simple language (5th grade level) that explains why the scheme would help the user. If the primary language is Hindi or another Indian language, provide the reason primarily in that language.
+For the relevance_reason field, use very simple language (5th grade level) \
+that explains why the scheme would help the user. If the primary language is \
+Hindi or another Indian language, provide the reason primarily in that language.
 
 Return ONLY the JSON array. Sort by relevance_score descending.
-"""
+"""  # noqa: E501

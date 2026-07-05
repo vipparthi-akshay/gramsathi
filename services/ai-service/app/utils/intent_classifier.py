@@ -1,7 +1,7 @@
 import json
 import re
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
 from app.models.gemini_client import GeminiClient
 
@@ -115,7 +115,8 @@ class IntentClassifier:
             f"Return ONLY a JSON object with:\n"
             f"- 'intent': one of the above intents\n"
             f"- 'confidence': float between 0 and 1\n"
-            f"- 'entities': object with extracted entities like scheme_name, document_type, action, department, time_reference\n"
+            f"- 'entities': object with extracted entities like "
+            f"scheme_name, document_type, action, department, time_reference\n"
             f"- 'suggested_handler': the intent itself or a more specific handler name\n"
         )
 

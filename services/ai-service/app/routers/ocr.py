@@ -1,7 +1,7 @@
 import base64
 import json
 import logging
-from typing import Any, Dict
+from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
 
@@ -55,7 +55,10 @@ async def process_document(
     extracted_fields = {}
     for field_name, field_data in analysis.extracted_fields.items():
         field_value = field_data if not isinstance(field_data, dict) else field_data.get("value", "")
-        field_confidence = field_data.get("confidence", analysis.confidence) if isinstance(field_data, dict) else analysis.confidence
+        field_confidence = (
+            field_data.get("confidence", analysis.confidence)
+            if isinstance(field_data, dict) else analysis.confidence
+        )
         is_valid = True
 
         for flag in validation.flags:
@@ -109,7 +112,8 @@ async def analyze_document(
         f"Analyze the following OCR-extracted data from a {request.document_type} document.\n\n"
         f"### Purpose of analysis\n{request.purpose}\n\n"
         f"### OCR Data\n{json.dumps(extracted_data, ensure_ascii=False, indent=2)}\n\n"
-        f"### Validation Flags\n{json.dumps(validation.flags, ensure_ascii=False, indent=2) if validation.flags else 'No validation flags'}\n\n"
+        f"### Validation Flags\n"
+        f"{json.dumps(validation.flags, ensure_ascii=False, indent=2) if validation.flags else 'No validation flags'}\n\n"
         f"Please provide:\n"
         f"1. A detailed analysis of the document contents\n"
         f"2. Any inconsistencies or suspicious patterns found\n"

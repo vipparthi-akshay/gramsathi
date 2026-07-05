@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 
 LANGUAGE_MAP: Dict[str, Dict] = {
     "hi": {
@@ -172,7 +172,10 @@ LANGUAGE_MAP: Dict[str, Dict] = {
 }
 
 DIALECT_MAP: Dict[str, List[str]] = {
-    "hi": ["awadhi", "braj", "bhojpuri", "magahi", "chhattisgarhi", "haryanvi", "marwari", "mewari", "bagheli", "bundeli"],
+    "hi": [
+        "awadhi", "braj", "bhojpuri", "magahi", "chhattisgarhi",
+        "haryanvi", "marwari", "mewari", "bagheli", "bundeli",
+    ],
     "mr": ["varhadi", "konkani_mr"],
     "gu": ["kathiyawadi", "surati", "charotari"],
     "bn": ["banglali", "rahr", "varendri"],

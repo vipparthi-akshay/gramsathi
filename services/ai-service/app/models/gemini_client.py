@@ -1,5 +1,5 @@
 import json
-from typing import Any, AsyncGenerator, Dict, Generator, List, Optional
+from typing import Any, AsyncGenerator, Dict, List, Optional
 
 import google.generativeai as genai
 from google.generativeai import GenerativeModel
@@ -18,7 +18,11 @@ class GeminiClient:
         instruction = f"Respond in the language: {language}"
         if dialect:
             instruction += f". Use the dialect: {dialect}"
-        instruction += ". If the language is one of the Indian regional languages, respond primarily in that language while keeping key terms in English where appropriate."
+        instruction += (
+            ". If the language is one of the Indian regional languages, "
+            "respond primarily in that language while keeping key terms "
+            "in English where appropriate."
+        )
         return instruction
 
     def generate_response(
@@ -78,8 +82,9 @@ class GeminiClient:
                 "Set confidence scores for each field."
             ),
             "income_certificate": (
-                "Extract the following fields from this income certificate image. Return ONLY a JSON object "
-                "with these keys: certificate_number, holder_name, annual_income, issue_date, issuing_authority, valid_until."
+                "Extract the following fields from this income certificate image. "
+                "Return ONLY a JSON object with these keys: certificate_number, "
+                "holder_name, annual_income, issue_date, issuing_authority, valid_until."
             ),
             "land_record": (
                 "Extract the following fields from this land record document image. Return ONLY a JSON object "

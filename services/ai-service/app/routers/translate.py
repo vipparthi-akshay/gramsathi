@@ -13,7 +13,6 @@ from app.schemas.translate import (
     TranslateResponse,
 )
 from app.utils.language_utils import (
-    get_google_translate_target,
     get_language_name,
     normalize_language_code,
 )
@@ -60,8 +59,9 @@ async def translate_text(
 
             if response.translations:
                 translated_text = response.translations[0].translated_text
-                if hasattr(response.translations[0], 'glossary_translations') and response.translations[0].glossary_translations:
-                    translated_text = response.translations[0].glossary_translations[0].translated_text
+                translations = response.translations[0]
+                if hasattr(translations, 'glossary_translations') and translations.glossary_translations:
+                    translated_text = translations.glossary_translations[0].translated_text
         except Exception as e:
             logger.warning(f"Google Translate API failed, falling back to Gemini: {e}")
 
@@ -109,7 +109,11 @@ async def detect_language(
                 detection = response.languages[0]
                 result = {
                     "language": detection.language_code or "unknown",
-                    "confidence": detection.confidence if hasattr(detection, 'confidence') and detection.confidence else 0.95,
+                    "confidence": (
+                        detection.confidence
+                        if hasattr(detection, 'confidence') and detection.confidence
+                        else 0.95
+                    ),
                     "dialect": None,
                 }
         except Exception as e:

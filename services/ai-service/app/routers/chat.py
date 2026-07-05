@@ -1,14 +1,12 @@
 import json
 import logging
-from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.models.gemini_client import GeminiClient
 from app.prompts.complaint_draft import COMPLAINT_DRAFT_PROMPT
 from app.prompts.eligibility import ELIGIBILITY_PROMPT_TEMPLATE
-from app.prompts.form_fill import FORM_FILL_PROMPT
 from app.prompts.scheme_discovery import SCHEME_DISCOVERY_PROMPT
 from app.schemas.chat import ChatRequest, ChatResponse, ConversationListOut, ConversationOut
 from app.utils.context_manager import ConversationContextManager
@@ -134,7 +132,10 @@ async def _handle_scheme_discovery(
         citizen_area_type=citizen_profile.get("area_type", "Rural"),
         citizen_family_size=citizen_profile.get("family_size", "N/A"),
         citizen_marital_status=citizen_profile.get("marital_status", "N/A"),
-        matched_schemes=json.dumps(matched_schemes, ensure_ascii=False, indent=2) if matched_schemes else "No specific schemes found",
+        matched_schemes=(
+            json.dumps(matched_schemes, ensure_ascii=False, indent=2)
+            if matched_schemes else "No specific schemes found"
+        ),
         conversation_history=conversation_history,
         user_language=request.language,
         user_dialect=request.dialect or "Standard",
@@ -215,7 +216,7 @@ def _format_complaint_response(complaint_data: Dict, language: str) -> str:
             f"**औपचारिक विवरण:**\n{complaint_data.get('description_formal', '')}\n\n"
             f"**आवश्यक साक्ष्य:**\n" +
             "\n".join(f"- {e}" for e in complaint_data.get('evidence_needed', [])) +
-            f"\n\nक्या आप इस शिकायत को दर्ज करना चाहते हैं? (हाँ/नहीं)"
+            "\n\nक्या आप इस शिकायत को दर्ज करना चाहते हैं? (हाँ/नहीं)"
         )
     else:
         return (
@@ -226,7 +227,7 @@ def _format_complaint_response(complaint_data: Dict, language: str) -> str:
             f"**Formal Description:**\n{complaint_data.get('description_formal', '')}\n\n"
             f"**Evidence Needed:**\n" +
             "\n".join(f"- {e}" for e in complaint_data.get('evidence_needed', [])) +
-            f"\n\nWould you like to file this complaint? (Yes/No)"
+            "\n\nWould you like to file this complaint? (Yes/No)"
         )
 
 

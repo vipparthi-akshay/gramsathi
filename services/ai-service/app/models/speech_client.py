@@ -1,11 +1,7 @@
-import base64
-import io
 from dataclasses import dataclass
 from typing import Dict, List, Optional
 
 from google.cloud import speech, texttospeech
-
-from app.config import settings
 
 
 @dataclass
@@ -24,29 +20,33 @@ class AudioResponse:
     sample_rate: int = 24000
 
 
+def _lang_entry(code: str, tts: str, tts_f: str) -> Dict:
+    return {"code": code, "model": "latest_short", "tts_name": tts, "tts_name_female": tts_f}
+
+
 INDIAN_LANGUAGE_CONFIG: Dict[str, Dict] = {
-    "hi": {"code": "hi-IN", "model": "latest_short", "tts_name": "hi-IN-Neural2-A", "tts_name_female": "hi-IN-Neural2-C"},
-    "bn": {"code": "bn-IN", "model": "latest_short", "tts_name": "bn-IN-Neural2-A", "tts_name_female": "bn-IN-Neural2-B"},
-    "te": {"code": "te-IN", "model": "latest_short", "tts_name": "te-IN-Neural2-A", "tts_name_female": "te-IN-Neural2-B"},
-    "mr": {"code": "mr-IN", "model": "latest_short", "tts_name": "mr-IN-Neural2-A", "tts_name_female": "mr-IN-Neural2-B"},
-    "ta": {"code": "ta-IN", "model": "latest_short", "tts_name": "ta-IN-Neural2-A", "tts_name_female": "ta-IN-Neural2-B"},
-    "gu": {"code": "gu-IN", "model": "latest_short", "tts_name": "gu-IN-Neural2-A", "tts_name_female": "gu-IN-Neural2-B"},
-    "kn": {"code": "kn-IN", "model": "latest_short", "tts_name": "kn-IN-Neural2-A", "tts_name_female": "kn-IN-Neural2-B"},
-    "ml": {"code": "ml-IN", "model": "latest_short", "tts_name": "ml-IN-Neural2-A", "tts_name_female": "ml-IN-Neural2-B"},
-    "or": {"code": "or-IN", "model": "latest_short", "tts_name": "or-IN-Neural2-A", "tts_name_female": "or-IN-Neural2-B"},
-    "pa": {"code": "pa-IN", "model": "latest_short", "tts_name": "pa-IN-Neural2-A", "tts_name_female": "pa-IN-Neural2-B"},
-    "as": {"code": "as-IN", "model": "latest_short", "tts_name": "as-IN-Standard-A", "tts_name_female": "as-IN-Standard-B"},
-    "mai": {"code": "mai-IN", "model": "latest_short", "tts_name": "mai-IN-Standard-A", "tts_name_female": "mai-IN-Standard-B"},
-    "sat": {"code": "sat-IN", "model": "latest_short", "tts_name": "sat-IN-Standard-A", "tts_name_female": "sat-IN-Standard-A"},
-    "ks": {"code": "ks-IN", "model": "latest_short", "tts_name": "ks-IN-Standard-A", "tts_name_female": "ks-IN-Standard-A"},
-    "sd": {"code": "sd-IN", "model": "latest_short", "tts_name": "sd-IN-Standard-A", "tts_name_female": "sd-IN-Standard-A"},
-    "mni": {"code": "mni-IN", "model": "latest_short", "tts_name": "mni-IN-Standard-A", "tts_name_female": "mni-IN-Standard-A"},
-    "ne": {"code": "ne-IN", "model": "latest_short", "tts_name": "ne-IN-Standard-A", "tts_name_female": "ne-IN-Standard-A"},
-    "si": {"code": "si-IN", "model": "latest_short", "tts_name": "si-IN-Standard-A", "tts_name_female": "si-IN-Standard-A"},
-    "ur": {"code": "ur-IN", "model": "latest_short", "tts_name": "ur-IN-Standard-A", "tts_name_female": "ur-IN-Standard-A"},
-    "en": {"code": "en-IN", "model": "latest_short", "tts_name": "en-IN-Neural2-A", "tts_name_female": "en-IN-Neural2-C"},
-    "sa": {"code": "sa-IN", "model": "latest_short", "tts_name": "sa-IN-Standard-A", "tts_name_female": "sa-IN-Standard-A"},
-    "kok": {"code": "kok-IN", "model": "latest_short", "tts_name": "kok-IN-Standard-A", "tts_name_female": "kok-IN-Standard-A"},
+    "hi": _lang_entry("hi-IN", "hi-IN-Neural2-A", "hi-IN-Neural2-C"),
+    "bn": _lang_entry("bn-IN", "bn-IN-Neural2-A", "bn-IN-Neural2-B"),
+    "te": _lang_entry("te-IN", "te-IN-Neural2-A", "te-IN-Neural2-B"),
+    "mr": _lang_entry("mr-IN", "mr-IN-Neural2-A", "mr-IN-Neural2-B"),
+    "ta": _lang_entry("ta-IN", "ta-IN-Neural2-A", "ta-IN-Neural2-B"),
+    "gu": _lang_entry("gu-IN", "gu-IN-Neural2-A", "gu-IN-Neural2-B"),
+    "kn": _lang_entry("kn-IN", "kn-IN-Neural2-A", "kn-IN-Neural2-B"),
+    "ml": _lang_entry("ml-IN", "ml-IN-Neural2-A", "ml-IN-Neural2-B"),
+    "or": _lang_entry("or-IN", "or-IN-Neural2-A", "or-IN-Neural2-B"),
+    "pa": _lang_entry("pa-IN", "pa-IN-Neural2-A", "pa-IN-Neural2-B"),
+    "as": _lang_entry("as-IN", "as-IN-Standard-A", "as-IN-Standard-B"),
+    "mai": _lang_entry("mai-IN", "mai-IN-Standard-A", "mai-IN-Standard-B"),
+    "sat": _lang_entry("sat-IN", "sat-IN-Standard-A", "sat-IN-Standard-A"),
+    "ks": _lang_entry("ks-IN", "ks-IN-Standard-A", "ks-IN-Standard-A"),
+    "sd": _lang_entry("sd-IN", "sd-IN-Standard-A", "sd-IN-Standard-A"),
+    "mni": _lang_entry("mni-IN", "mni-IN-Standard-A", "mni-IN-Standard-A"),
+    "ne": _lang_entry("ne-IN", "ne-IN-Standard-A", "ne-IN-Standard-A"),
+    "si": _lang_entry("si-IN", "si-IN-Standard-A", "si-IN-Standard-A"),
+    "ur": _lang_entry("ur-IN", "ur-IN-Standard-A", "ur-IN-Standard-A"),
+    "en": _lang_entry("en-IN", "en-IN-Neural2-A", "en-IN-Neural2-C"),
+    "sa": _lang_entry("sa-IN", "sa-IN-Standard-A", "sa-IN-Standard-A"),
+    "kok": _lang_entry("kok-IN", "kok-IN-Standard-A", "kok-IN-Standard-A"),
 }
 
 

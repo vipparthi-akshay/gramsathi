@@ -1,5 +1,3 @@
-import base64
-import json
 from typing import Any, Dict, List, Optional
 
 from google.cloud import documentai
@@ -111,7 +109,11 @@ class VisionClient:
         docai_confidence = 0.0
 
         if docai_doc:
-            docai_confidence = docai_doc.ml_confidence if hasattr(docai_doc, 'ml_confidence') and docai_doc.ml_confidence else 0.0
+            docai_confidence = (
+                docai_doc.ml_confidence
+                if hasattr(docai_doc, 'ml_confidence') and docai_doc.ml_confidence
+                else 0.0
+            )
 
             for entity in docai_doc.entities:
                 extracted_fields[entity.type_] = {

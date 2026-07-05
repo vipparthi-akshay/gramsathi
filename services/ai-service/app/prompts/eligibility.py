@@ -1,4 +1,6 @@
-ELIGIBILITY_PROMPT_TEMPLATE = """You are a government scheme eligibility assistant. Your job is to explain eligibility criteria in simple terms that any citizen can understand.
+ELIGIBILITY_PROMPT_TEMPLATE = """\
+You are a government scheme eligibility assistant. Your job is to explain \
+eligibility criteria in simple terms that any citizen can understand.
 
 ## Citizen Profile
 - Name: {citizen_name}
@@ -42,5 +44,6 @@ Based on the eligibility assessment, provide:
 3. Who to contact for help
 4. Any deadlines or important dates
 
-IMPORTANT: Respond in {user_language}. Use {user_dialect} dialect if specified. Keep language at a 5th-grade reading level.
-"""
+IMPORTANT: Respond in {user_language}. Use {user_dialect} dialect if specified. \
+Keep language at a 5th-grade reading level.
+"""  # noqa: E501

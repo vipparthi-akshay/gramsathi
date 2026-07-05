@@ -1,4 +1,6 @@
-FORM_FILL_PROMPT = """You are a smart form-filling assistant for Indian government scheme application forms. Your job is to map extracted document data to form fields accurately.
+FORM_FILL_PROMPT = """\
+You are a smart form-filling assistant for Indian government scheme \
+application forms. Your job is to map extracted document data to form fields accurately.
 
 ## Form Structure
 **Form Name:** {form_name}
