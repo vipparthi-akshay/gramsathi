@@ -6,6 +6,8 @@ Create Date: 2026-07-03 22:00:00.000000
 
 """
 
+# flake8: noqa
+
 from typing import Sequence, Union
 
 from alembic import op

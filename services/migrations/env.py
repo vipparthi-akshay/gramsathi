@@ -8,18 +8,18 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from app.models.database import Base
 
-from app.models.user import User
-from app.models.otp import OTPRecord
-from app.models.session import Session
-from app.models.citizen import Citizen
-from app.models.family import FamilyMember
-from app.models.scheme import Scheme
-from app.models.application import Application
-from app.models.document import Document
-from app.models.grievance import Grievance
-from app.models.complaint_tracking import ComplaintTracking
-from app.models.notification import Notification, NotificationPreference
-from app.models.template import NotificationTemplate
+from app.models.user import User  # noqa: F401
+from app.models.otp import OTPRecord  # noqa: F401
+from app.models.session import Session  # noqa: F401
+from app.models.citizen import Citizen  # noqa: F401
+from app.models.family import FamilyMember  # noqa: F401
+from app.models.scheme import Scheme  # noqa: F401
+from app.models.application import Application  # noqa: F401
+from app.models.document import Document  # noqa: F401
+from app.models.grievance import Grievance  # noqa: F401
+from app.models.complaint_tracking import ComplaintTracking  # noqa: F401
+from app.models.notification import Notification, NotificationPreference  # noqa: F401
+from app.models.template import NotificationTemplate  # noqa: F401
 
 config = context.config
 if config.config_file_name is not None:
