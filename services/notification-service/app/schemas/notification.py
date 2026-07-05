@@ -46,11 +46,14 @@ class NotificationPreferenceUpdate(BaseModel):
 
 class NotificationSendRequest(BaseModel):
     citizen_id: uuid.UUID
-    type: str = Field(..., pattern="^(application_update|scheme_alert|deadline_reminder|payment_confirmation|grievance_update|welcome|system)$")
+    type: str = Field(
+        ...,
+        pattern=r"^(application_update|scheme_alert|deadline_reminder|payment_confirmation|grievance_update|welcome|system)$",
+    )
     title: str = Field(..., max_length=500)
     body: str = Field(..., max_length=5000)
     metadata: Optional[Dict[str, Any]] = None
-    delivery_channel: str = Field(default="in_app", pattern="^(in_app|sms|whatsapp|email|all)$")
+    delivery_channel: str = Field(default="in_app", pattern=r"^(in_app|sms|whatsapp|email|all)$")
     template_id: Optional[uuid.UUID] = None
 
 
@@ -77,7 +80,10 @@ class TemplateOut(BaseModel):
 
 class TemplateCreate(BaseModel):
     name: str = Field(..., max_length=200)
-    type: str = Field(..., pattern="^(application_update|scheme_alert|deadline_reminder|payment_confirmation|grievance_update|welcome|system)$")
+    type: str = Field(
+        ...,
+        pattern=r"^(application_update|scheme_alert|deadline_reminder|payment_confirmation|grievance_update|welcome|system)$",
+    )
     title_template: str = Field(..., max_length=500)
     body_template: str = Field(..., max_length=5000)
     variables: Optional[Dict[str, Any]] = None

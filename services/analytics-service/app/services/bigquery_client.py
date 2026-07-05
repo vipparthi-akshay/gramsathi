@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta, timezone
 from typing import Any, Optional
 
-import httpx
 from google.cloud import bigquery
 from tenacity import retry, stop_after_attempt, wait_exponential
 
@@ -275,7 +274,9 @@ class BigQueryClient:
                 )
         return results
 
-    async def get_geo_heatmap(self, state: Optional[str] = None, district: Optional[str] = None) -> list[GeoHeatmapPoint]:
+    async def get_geo_heatmap(
+        self, state: Optional[str] = None, district: Optional[str] = None
+    ) -> list[GeoHeatmapPoint]:
         base_points = [
             (26.8467, 80.9462, "Lucknow"),
             (28.6139, 77.2090, "Delhi"),

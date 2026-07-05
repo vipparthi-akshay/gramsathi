@@ -19,7 +19,10 @@ DOCUMENT_TYPE_MAP = {
 
 FIELD_EXTRACTORS = {
     "aadhaar": ["aadhaar_number", "name", "dob", "gender", "address", "father_name"],
-    "income_certificate": ["certificate_number", "name", "annual_income", "issue_date", "issuing_authority", "valid_until"],
+    "income_certificate": [
+        "certificate_number", "name", "annual_income",
+        "issue_date", "issuing_authority", "valid_until",
+    ],
     "land_record": ["survey_number", "owner_name", "village", "district", "area", "land_type", "khata_number"],
     "bank_passbook": ["account_number", "ifsc_code", "account_holder", "bank_name", "branch", "account_type"],
 }
@@ -69,7 +72,9 @@ class OCRProcessor:
 
         return extracted
 
-    async def _process_with_docai(self, image_data: bytes, processor_name: str, document_type: str) -> Optional[Dict[str, Any]]:
+    async def _process_with_docai(
+        self, image_data: bytes, processor_name: str, document_type: str
+    ) -> Optional[Dict[str, Any]]:
         mime_type = self._detect_mime_type(image_data)
         document = documentai.RawDocument(content=image_data, mime_type=mime_type)
         request = documentai.ProcessRequest(name=processor_name, raw_document=document)
@@ -109,7 +114,10 @@ class OCRProcessor:
         return {
             "raw_text": raw_text,
             "extracted_fields": self._extract_fields_from_text(raw_text, document_type),
-            "confidence": float(response.full_text_annotation.pages[0].confidence) if response.full_text_annotation.pages else 0.0,
+            "confidence": (
+                float(response.full_text_annotation.pages[0].confidence)
+                if response.full_text_annotation.pages else 0.0
+            ),
             "document_type": document_type,
         }
 
@@ -165,7 +173,7 @@ Fields: {json.dumps(data.get('extracted_fields', {}))}
 Return a JSON with a single field 'authenticity_score' between 0.0 and 1.0."""
             async with httpx.AsyncClient(timeout=30.0) as client:
                 resp = await client.post(
-                    f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent",
+                    "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent",
                     params={"key": settings.GEMINI_API_KEY},
                     json={"contents": [{"parts": [{"text": prompt}]}]},
                 )

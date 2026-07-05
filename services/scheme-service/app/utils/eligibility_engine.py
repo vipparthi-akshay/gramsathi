@@ -334,7 +334,10 @@ class EligibilityEngine:
         if citizen.education_level is None:
             return {"passed": True, "score": 0.5, "reason": "Education level unknown"}
 
-        levels = ["none", "primary", "middle", "secondary", "higher_secondary", "graduate", "post_graduate", "doctorate"]
+        levels = [
+            "none", "primary", "middle", "secondary",
+            "higher_secondary", "graduate", "post_graduate", "doctorate",
+        ]
         citizen_idx = levels.index(citizen.education_level.lower()) if citizen.education_level.lower() in levels else -1
         min_idx = levels.index(min_level.lower()) if min_level.lower() in levels else -1
 

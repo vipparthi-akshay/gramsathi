@@ -4,8 +4,8 @@ from datetime import datetime, timezone
 from typing import List, Optional
 
 import httpx
-from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
-from sqlalchemy import select, func, or_, and_, desc
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy import select, func, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
@@ -20,7 +20,7 @@ from app.schemas.grievance import (
     GrievanceOut,
     GrievanceUpdate,
 )
-from app.utils.dependencies import get_current_user, get_admin_user, get_gov_officer
+from app.utils.dependencies import get_current_user
 
 router = APIRouter(tags=["Grievances"])
 
@@ -282,7 +282,10 @@ async def reopen_grievance(
     if not grievance:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Grievance not found")
     if grievance.status not in ("resolved", "closed"):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Only resolved/closed grievances can be reopened")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Only resolved/closed grievances can be reopened",
+        )
 
     grievance.status = "under_review"
     grievance.resolved_at = None
@@ -340,7 +343,7 @@ Return ONLY a JSON with:
 - subject (short 10 word max title)
 - priority (low, medium, high, or critical)"""
         resp = await client.post(
-            f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent",
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent",
             params={"key": settings.GEMINI_API_KEY},
             json={"contents": [{"parts": [{"text": prompt}]}]},
         )
@@ -354,7 +357,6 @@ Return ONLY a JSON with:
 
 
 def _fallback_draft(description: str, category: Optional[str]) -> GrievanceDraftResponse:
-    import re
     lines = [l.strip() for l in description.split("\n") if l.strip()]
     subject = lines[0][:100] if lines else "Grievance regarding government service"
     if len(subject) > 100:

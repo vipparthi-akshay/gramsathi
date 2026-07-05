@@ -1,7 +1,7 @@
 import base64
 import json
 import logging
-from typing import Any
+
 
 from fastapi import APIRouter, Depends, HTTPException
 
@@ -112,18 +112,19 @@ async def analyze_document(
         f"Analyze the following OCR-extracted data from a {request.document_type} document.\n\n"
         f"### Purpose of analysis\n{request.purpose}\n\n"
         f"### OCR Data\n{json.dumps(extracted_data, ensure_ascii=False, indent=2)}\n\n"
-        f"### Validation Flags\n"
-        f"{json.dumps(validation.flags, ensure_ascii=False, indent=2) if validation.flags else 'No validation flags'}\n\n"
-        f"Please provide:\n"
-        f"1. A detailed analysis of the document contents\n"
-        f"2. Any inconsistencies or suspicious patterns found\n"
-        f"3. Suggestions for the citizen regarding this document\n"
-        f"4. Overall confidence assessment\n\n"
-        f"Return your analysis as a JSON object with:\n"
-        f"- 'analysis': detailed text analysis\n"
-        f"- 'flags': list of flags found (field, severity, message)\n"
-        f"- 'suggestions': list of actionable suggestions\n"
-        f"- 'overall_confidence': float 0.0-1.0"
+        "### Validation Flags\n"
+        f"{json.dumps(validation.flags, ensure_ascii=False, indent=2) if validation.flags else 'No validation flags'}"
+        "\n\n"
+        "Please provide:\n"
+        "1. A detailed analysis of the document contents\n"
+        "2. Any inconsistencies or suspicious patterns found\n"
+        "3. Suggestions for the citizen regarding this document\n"
+        "4. Overall confidence assessment\n\n"
+        "Return your analysis as a JSON object with:\n"
+        "- 'analysis': detailed text analysis\n"
+        "- 'flags': list of flags found (field, severity, message)\n"
+        "- 'suggestions': list of actionable suggestions\n"
+        "- 'overall_confidence': float 0.0-1.0"
     )
 
     result_text = gemini.generate_response(

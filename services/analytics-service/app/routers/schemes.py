@@ -10,7 +10,10 @@ router = APIRouter(prefix="/api/v1/analytics", tags=["Scheme Analytics"])
 @router.get("/schemes", response_model=list[SchemeAnalytics])
 async def get_scheme_analytics(
     category: str | None = Query(None),
-    sort_by: str = Query("total_applications", pattern="^(total_applications|approval_rate|avg_processing_time_days|benefits_disbursed)$"),
+    sort_by: str = Query(
+        "total_applications",
+        pattern=r"^(total_applications|approval_rate|avg_processing_time_days|benefits_disbursed)$",
+    ),
     limit: int = Query(10, ge=1, le=100),
     bq: BigQueryClient = Depends(get_bigquery_client),
     admin: dict = Depends(get_admin_user),

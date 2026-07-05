@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -37,7 +37,9 @@ class GrievanceCreate(BaseModel):
 
 
 class GrievanceUpdate(BaseModel):
-    category: Optional[str] = Field(None, pattern="^(scheme_related|document_issue|payment_delay|staff_behavior|technical|other)$")
+    category: Optional[str] = Field(
+        None, pattern=r"^(scheme_related|document_issue|payment_delay|staff_behavior|technical|other)$"
+    )
     department: Optional[str] = None
     subject: Optional[str] = Field(None, min_length=10, max_length=500)
     description: Optional[str] = Field(None, min_length=20)

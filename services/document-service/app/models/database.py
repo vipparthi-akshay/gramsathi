@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import AsyncGenerator
 
 from sqlalchemy import DateTime, MetaData, func

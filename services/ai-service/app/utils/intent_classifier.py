@@ -107,17 +107,17 @@ class IntentClassifier:
 
     def _classify_with_gemini(self, message: str, language: str) -> Optional[IntentResult]:
         prompt = (
-            f"Analyze the following user message and classify its intent. "
+            "Analyze the following user message and classify its intent. "
             f"Consider the language: {language}\n\n"
             f"Message: {message}\n\n"
-            f"Possible intents: scheme_discovery, application_help, complaint, "
-            f"status_check, document_help, eligibility_check, general_query\n\n"
-            f"Return ONLY a JSON object with:\n"
-            f"- 'intent': one of the above intents\n"
-            f"- 'confidence': float between 0 and 1\n"
-            f"- 'entities': object with extracted entities like "
-            f"scheme_name, document_type, action, department, time_reference\n"
-            f"- 'suggested_handler': the intent itself or a more specific handler name\n"
+            "Possible intents: scheme_discovery, application_help, complaint, "
+            "status_check, document_help, eligibility_check, general_query\n\n"
+            "Return ONLY a JSON object with:\n"
+            "- 'intent': one of the above intents\n"
+            "- 'confidence': float between 0 and 1\n"
+            "- 'entities': object with extracted entities like "
+            "scheme_name, document_type, action, department, time_reference\n"
+            "- 'suggested_handler': the intent itself or a more specific handler name\n"
         )
 
         try:

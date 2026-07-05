@@ -126,12 +126,12 @@ async def process_voice_chunk(
         )
 
     prompt = (
-        f"You are a helpful government assistant. Respond conversationally.\n\n"
+        "You are a helpful government assistant. Respond conversationally.\n\n"
         f"Conversation history:\n{conversation_history}\n\n"
         f"User's voice input: {transcript}\n"
         f"Detected intent: {intent}\n\n"
         f"Provide a helpful response in {session['language']}. "
-        f"Keep responses concise since this will be converted to speech."
+        "Keep responses concise since this will be converted to speech."
     )
 
     response_text = gemini.generate_response(

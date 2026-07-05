@@ -1,9 +1,9 @@
 import uuid
 from datetime import datetime, timezone
-from typing import List, Optional
+from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Request, UploadFile, File, Form, status
-from sqlalchemy import select, update, func, and_
+from fastapi import APIRouter, Depends, HTTPException, Request, UploadFile, File, Form, status
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings

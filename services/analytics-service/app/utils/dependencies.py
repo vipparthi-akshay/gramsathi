@@ -1,5 +1,5 @@
 import httpx
-from fastapi import Depends, HTTPException, Request, status
+from fastapi import HTTPException, Request, status
 
 from app.config import settings
 from app.services.bigquery_client import BigQueryClient

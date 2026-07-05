@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime, timedelta, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.models.metrics import ExportRequest, ExportResponse, ExportStatus
 from app.services.bigquery_client import BigQueryClient

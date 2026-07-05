@@ -1,4 +1,3 @@
-from typing import List
 from uuid import UUID
 
 import httpx
@@ -13,7 +12,6 @@ from app.schemas.eligibility import (
     EligibilityRequest,
     EligibilityResponse,
 )
-from app.schemas.scheme import SchemeOut
 from app.utils.dependencies import get_current_user, get_db_session
 from app.utils.eligibility_engine import CitizenProfile, EligibilityEngine
 

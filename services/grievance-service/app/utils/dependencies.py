@@ -5,7 +5,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
 
 from app.config import settings
-from app.models.database import get_db as get_db_session
+
 
 security_scheme = HTTPBearer(auto_error=False)
 

@@ -158,16 +158,16 @@ async def _handle_application_help(
     prompt = (
         f"The user wants help applying for {scheme_name}. "
         f"Their question is: {request.message}\n\n"
-        f"Please provide step-by-step application instructions including:\n"
-        f"1. List of required documents\n"
-        f"2. Where to get the application form (online portal URL or CSC center)\n"
-        f"3. Step-by-step fill-up instructions\n"
-        f"4. Where to submit the form\n"
-        f"5. Fees (if any) and payment methods\n"
-        f"6. Expected processing time\n"
-        f"7. How to track application status\n"
-        f"8. Helpline number for queries\n\n"
-        f"Be specific and practical. Include any recent changes to the application process."
+        "Please provide step-by-step application instructions including:\n"
+        "1. List of required documents\n"
+        "2. Where to get the application form (online portal URL or CSC center)\n"
+        "3. Step-by-step fill-up instructions\n"
+        "4. Where to submit the form\n"
+        "5. Fees (if any) and payment methods\n"
+        "6. Expected processing time\n"
+        "7. How to track application status\n"
+        "8. Helpline number for queries\n\n"
+        "Be specific and practical. Include any recent changes to the application process."
     )
     return gemini.generate_response(prompt, language=request.language, dialect=request.dialect)
 
@@ -209,25 +209,25 @@ async def _handle_complaint(
 def _format_complaint_response(complaint_data: Dict, language: str) -> str:
     if language == "hi":
         return (
-            f"**शिकायत का विवरण तैयार**\n\n"
+            "**शिकायत का विवरण तैयार**\n\n"
             f"**विभाग:** {complaint_data.get('department', 'अज्ञात')}\n"
             f"**शिकायत प्रकार:** {complaint_data.get('issue_type', 'अन्य')}\n"
             f"**प्राथमिकता:** {complaint_data.get('priority', 'मध्यम').upper()}\n\n"
             f"**औपचारिक विवरण:**\n{complaint_data.get('description_formal', '')}\n\n"
-            f"**आवश्यक साक्ष्य:**\n" +
-            "\n".join(f"- {e}" for e in complaint_data.get('evidence_needed', [])) +
-            "\n\nक्या आप इस शिकायत को दर्ज करना चाहते हैं? (हाँ/नहीं)"
+            "**आवश्यक साक्ष्य:**\n"
+            + "\n".join(f"- {e}" for e in complaint_data.get('evidence_needed', []))
+            + "\n\nक्या आप इस शिकायत को दर्ज करना चाहते हैं? (हाँ/नहीं)"
         )
     else:
         return (
-            f"**Complaint Draft Ready**\n\n"
+            "**Complaint Draft Ready**\n\n"
             f"**Department:** {complaint_data.get('department', 'Unknown')}\n"
             f"**Issue Type:** {complaint_data.get('issue_type', 'Other')}\n"
             f"**Priority:** {complaint_data.get('priority', 'medium').upper()}\n\n"
             f"**Formal Description:**\n{complaint_data.get('description_formal', '')}\n\n"
-            f"**Evidence Needed:**\n" +
-            "\n".join(f"- {e}" for e in complaint_data.get('evidence_needed', [])) +
-            "\n\nWould you like to file this complaint? (Yes/No)"
+            "**Evidence Needed:**\n"
+            + "\n".join(f"- {e}" for e in complaint_data.get('evidence_needed', []))
+            + "\n\nWould you like to file this complaint? (Yes/No)"
         )
 
 
@@ -240,15 +240,15 @@ async def _handle_status_check(
     prompt = (
         f"The user wants to check the status of {scheme_name}.\n\n"
         f"Their message: {request.message}\n\n"
-        f"Please help them check their application status:\n"
-        f"1. Ask them for their application ID/reference number if not provided\n"
-        f"2. Explain how to check status online (portal URL and steps)\n"
-        f"3. Explain how to check via SMS or missed call\n"
-        f"4. Explain how to check at CSC center\n"
-        f"5. Provide typical processing timeline\n"
-        f"6. Explain what different status messages mean\n"
-        f"7. Provide helpline number for further queries\n\n"
-        f"Since we don't have direct access to the portal's API, guide them through the process."
+        "Please help them check their application status:\n"
+        "1. Ask them for their application ID/reference number if not provided\n"
+        "2. Explain how to check status online (portal URL and steps)\n"
+        "3. Explain how to check via SMS or missed call\n"
+        "4. Explain how to check at CSC center\n"
+        "5. Provide typical processing timeline\n"
+        "6. Explain what different status messages mean\n"
+        "7. Provide helpline number for further queries\n\n"
+        "Since we don't have direct access to the portal's API, guide them through the process."
     )
     return gemini.generate_response(prompt, language=request.language, dialect=request.dialect)
 
@@ -262,12 +262,12 @@ async def _handle_document_help(
     prompt = (
         f"The user needs help with a {doc_type}.\n\n"
         f"Their message: {request.message}\n\n"
-        f"Based on their request, provide appropriate help:\n"
+        "Based on their request, provide appropriate help:\n"
         f"1. If they need to APPLY: steps to apply for {doc_type}, required documents, fees, process\n"
-        f"2. If they need to CORRECT/UPDATE: correction process, fees, documents needed, timeline\n"
-        f"3. If DOCUMENT IS LOST: re-issue process, FIR requirement (for some docs), fees\n"
-        f"4. If they need VERIFICATION: how to verify authenticity online\n\n"
-        f"Provide specific, actionable information."
+        "2. If they need to CORRECT/UPDATE: correction process, fees, documents needed, timeline\n"
+        "3. If DOCUMENT IS LOST: re-issue process, FIR requirement (for some docs), fees\n"
+        "4. If they need VERIFICATION: how to verify authenticity online\n\n"
+        "Provide specific, actionable information."
     )
     return gemini.generate_response(prompt, language=request.language, dialect=request.dialect)
 
@@ -315,11 +315,11 @@ async def _handle_eligibility_check(
     prompt = (
         f"The user wants to know if they are eligible for a scheme.\n\n"
         f"Their message: {request.message}\n\n"
-        f"Please ask clarifying questions to determine:\n"
-        f"1. Which specific scheme they are asking about\n"
-        f"2. Their specific situation details\n"
-        f"3. Provide general guidance on typical eligibility requirements\n"
-        f"4. Suggest how they can check their eligibility"
+        "Please ask clarifying questions to determine:\n"
+        "1. Which specific scheme they are asking about\n"
+        "2. Their specific situation details\n"
+        "3. Provide general guidance on typical eligibility requirements\n"
+        "4. Suggest how they can check their eligibility"
     )
     response = gemini.generate_response(prompt, language=request.language, dialect=request.dialect)
     return response, None
