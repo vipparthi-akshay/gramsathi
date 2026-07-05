@@ -58,7 +58,7 @@ async def request_id_middleware(request: Request, call_next):
     start_time = time.time()
     try:
         response: Response = await call_next(request)
-    except Exception as exc:
+    except Exception:
         response = JSONResponse(
             status_code=500,
             content={"detail": "Internal server error", "request_id": request_id},
