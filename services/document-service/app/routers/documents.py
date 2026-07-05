@@ -107,7 +107,7 @@ async def get_document(
     db: AsyncSession = Depends(get_db),
 ):
     result = await db.execute(
-        select(Document).where(Document.id == document_id, Document.is_deleted == False)
+        select(Document).where(Document.id == document_id, Document.is_deleted.is_(False))
     )
     doc = result.scalar_one_or_none()
     if not doc:
@@ -123,7 +123,7 @@ async def download_document(
     ocr: OCRProcessor = Depends(get_ocr_processor),
 ):
     result = await db.execute(
-        select(Document).where(Document.id == document_id, Document.is_deleted == False)
+        select(Document).where(Document.id == document_id, Document.is_deleted.is_(False))
     )
     doc = result.scalar_one_or_none()
     if not doc:
@@ -145,7 +145,7 @@ async def delete_document(
     db: AsyncSession = Depends(get_db),
 ):
     result = await db.execute(
-        select(Document).where(Document.id == document_id, Document.is_deleted == False)
+        select(Document).where(Document.id == document_id, Document.is_deleted.is_(False))
     )
     doc = result.scalar_one_or_none()
     if not doc:
@@ -163,7 +163,7 @@ async def verify_document(
     db: AsyncSession = Depends(get_db),
 ):
     result = await db.execute(
-        select(Document).where(Document.id == document_id, Document.is_deleted == False)
+        select(Document).where(Document.id == document_id, Document.is_deleted.is_(False))
     )
     doc = result.scalar_one_or_none()
     if not doc:
@@ -183,7 +183,7 @@ async def reprocess_document(
     ocr: OCRProcessor = Depends(get_ocr_processor),
 ):
     result = await db.execute(
-        select(Document).where(Document.id == document_id, Document.is_deleted == False)
+        select(Document).where(Document.id == document_id, Document.is_deleted.is_(False))
     )
     doc = result.scalar_one_or_none()
     if not doc:
@@ -225,7 +225,7 @@ async def get_ocr_extract(
     db: AsyncSession = Depends(get_db),
 ):
     result = await db.execute(
-        select(Document).where(Document.id == document_id, Document.is_deleted == False)
+        select(Document).where(Document.id == document_id, Document.is_deleted.is_(False))
     )
     doc = result.scalar_one_or_none()
     if not doc:
@@ -250,7 +250,7 @@ async def autofill_form(
 ):
     query = select(Document).where(
         Document.citizen_id == body.citizen_id,
-        Document.is_deleted == False,
+        Document.is_deleted.is_(False),
         Document.verification_status == "verified",
         Document.ocr_extracted_data.isnot(None),
     )

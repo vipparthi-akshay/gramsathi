@@ -65,9 +65,6 @@ async def list_templates(
         query = query.where(NotificationTemplate.language == language)
         count_query = count_query.where(NotificationTemplate.language == language)
 
-    total_result = await db.execute(count_query)
-    total = total_result.scalar() or 0
-
     query = query.order_by(NotificationTemplate.name).offset((page - 1) * page_size).limit(page_size)
     result = await db.execute(query)
     templates = result.scalars().all()

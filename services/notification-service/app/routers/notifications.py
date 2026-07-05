@@ -64,7 +64,7 @@ async def get_notifications(
     unread_count_result = await db.execute(
         select(func.count()).select_from(Notification).where(
             Notification.citizen_id == citizen_id,
-            Notification.is_read == False,
+            Notification.is_read.is_(False),
         )
     )
     unread_count = unread_count_result.scalar() or 0
@@ -113,7 +113,7 @@ async def mark_all_as_read(
         update(Notification)
         .where(
             Notification.citizen_id == citizen_id,
-            Notification.is_read == False,
+            Notification.is_read.is_(False),
         )
         .values(is_read=True, read_at=datetime.now(timezone.utc))
     )

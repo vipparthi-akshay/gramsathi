@@ -23,10 +23,10 @@ async def list_citizen_documents(
     db: AsyncSession = Depends(get_db),
 ):
     query = select(Document).where(
-        Document.citizen_id == citizen_id, Document.is_deleted == False
+        Document.citizen_id == citizen_id, Document.is_deleted.is_(False)
     )
     count_query = select(func.count()).select_from(Document).where(
-        Document.citizen_id == citizen_id, Document.is_deleted == False
+        Document.citizen_id == citizen_id, Document.is_deleted.is_(False)
     )
 
     if document_type:

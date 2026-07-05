@@ -33,9 +33,9 @@ async def list_schemes(
     current_user: dict = Depends(get_current_user),
     db: AsyncSession = Depends(get_db_session),
 ):
-    query = select(Scheme).where(Scheme.is_active == True, Scheme.is_deleted == False)
+    query = select(Scheme).where(Scheme.is_active.is_(True), Scheme.is_deleted.is_(False))
     count_query = select(func.count(Scheme.id)).where(
-        Scheme.is_active == True, Scheme.is_deleted == False
+        Scheme.is_active.is_(True), Scheme.is_deleted.is_(False)
     )
 
     if category:
@@ -90,7 +90,7 @@ async def list_categories(
 ):
     result = await db.execute(
         select(Scheme.category, func.count(Scheme.id).label("count"))
-        .where(Scheme.is_active == True, Scheme.is_deleted == False)
+        .where(Scheme.is_active.is_(True), Scheme.is_deleted.is_(False))
         .group_by(Scheme.category)
         .order_by(Scheme.category)
     )
@@ -104,7 +104,7 @@ async def get_scheme(
     db: AsyncSession = Depends(get_db_session),
 ):
     result = await db.execute(
-        select(Scheme).where(Scheme.id == scheme_id, Scheme.is_deleted == False)
+        select(Scheme).where(Scheme.id == scheme_id, Scheme.is_deleted.is_(False))
     )
     scheme = result.scalar_one_or_none()
     if not scheme:
@@ -143,7 +143,7 @@ async def match_schemes(
         pass
 
     result = await db.execute(
-        select(Scheme).where(Scheme.is_active == True, Scheme.is_deleted == False)
+        select(Scheme).where(Scheme.is_active.is_(True), Scheme.is_deleted.is_(False))
         .order_by(Scheme.created_at.desc())
         .limit(limit)
     )
@@ -166,7 +166,7 @@ async def check_eligibility(
     from app.utils.eligibility_engine import CitizenProfile, EligibilityEngine
 
     result = await db.execute(
-        select(Scheme).where(Scheme.id == request.scheme_id, Scheme.is_deleted == False)
+        select(Scheme).where(Scheme.id == request.scheme_id, Scheme.is_deleted.is_(False))
     )
     scheme = result.scalar_one_or_none()
     if not scheme:
@@ -234,7 +234,7 @@ async def update_scheme(
     db: AsyncSession = Depends(get_db_session),
 ):
     result = await db.execute(
-        select(Scheme).where(Scheme.id == scheme_id, Scheme.is_deleted == False)
+        select(Scheme).where(Scheme.id == scheme_id, Scheme.is_deleted.is_(False))
     )
     scheme = result.scalar_one_or_none()
     if not scheme:
@@ -257,7 +257,7 @@ async def delete_scheme(
     db: AsyncSession = Depends(get_db_session),
 ):
     result = await db.execute(
-        select(Scheme).where(Scheme.id == scheme_id, Scheme.is_deleted == False)
+        select(Scheme).where(Scheme.id == scheme_id, Scheme.is_deleted.is_(False))
     )
     scheme = result.scalar_one_or_none()
     if not scheme:

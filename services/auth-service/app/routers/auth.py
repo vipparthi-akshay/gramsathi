@@ -69,7 +69,7 @@ async def send_otp(
         select(OTPRecord).where(
             OTPRecord.mobile_number == mobile,
             OTPRecord.purpose == "login",
-            OTPRecord.is_used == False,
+            OTPRecord.is_used.is_(False),
             OTPRecord.expires_at > datetime.now(timezone.utc),
         ).order_by(OTPRecord.created_at.desc())
     )
@@ -136,7 +136,7 @@ async def verify_otp_endpoint(
         select(OTPRecord).where(
             OTPRecord.mobile_number == mobile,
             OTPRecord.purpose == "login",
-            OTPRecord.is_used == False,
+            OTPRecord.is_used.is_(False),
             OTPRecord.expires_at > datetime.now(timezone.utc),
         ).order_by(OTPRecord.created_at.desc()).limit(1)
     )
@@ -170,7 +170,6 @@ async def verify_otp_endpoint(
     )
     user = result.scalar_one_or_none()
 
-    is_new_user = False
     if not user:
         user = User(
             mobile_number=mobile,
@@ -179,7 +178,6 @@ async def verify_otp_endpoint(
         )
         db.add(user)
         await db.flush()
-        is_new_user = True
     elif not user.is_verified:
         user.is_verified = True
 
@@ -231,7 +229,7 @@ async def refresh_token(
     result = await db.execute(
         select(Session).where(
             Session.refresh_token_hash == refresh_token_hash,
-            Session.is_revoked == False,
+            Session.is_revoked.is_(False),
             Session.expires_at > datetime.now(timezone.utc),
         )
     )

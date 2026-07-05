@@ -49,7 +49,7 @@ async def create_application(
     db: AsyncSession = Depends(get_db_session),
 ):
     result = await db.execute(
-        select(Scheme).where(Scheme.id == app_data.scheme_id, Scheme.is_deleted == False)
+        select(Scheme).where(Scheme.id == app_data.scheme_id, Scheme.is_deleted.is_(False))
     )
     scheme = result.scalar_one_or_none()
     if not scheme:

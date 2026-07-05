@@ -20,7 +20,7 @@ from app.schemas.grievance import (
     GrievanceOut,
     GrievanceUpdate,
 )
-from app.utils.dependencies import get_current_user
+from app.utils.dependencies import get_current_user, get_gov_officer
 
 router = APIRouter(tags=["Grievances"])
 
@@ -163,19 +163,11 @@ async def list_pending_grievances(
     query = select(Grievance).where(
         Grievance.status.in_(["submitted", "under_review"])
     )
-    count_query = select(func.count()).select_from(Grievance).where(
-        Grievance.status.in_(["submitted", "under_review"])
-    )
 
     if priority:
         query = query.where(Grievance.priority == priority)
-        count_query = count_query.where(Grievance.priority == priority)
     if category:
         query = query.where(Grievance.category == category)
-        count_query = count_query.where(Grievance.category == category)
-
-    total_result = await db.execute(count_query)
-    total = total_result.scalar() or 0
 
     query = query.order_by(
         desc(Grievance.priority == "critical"),
@@ -311,7 +303,7 @@ async def ai_draft_grievance(
         try:
             draft = await _draft_with_gemini(body.description, body.category, body.original_language)
             return draft
-        except Exception as e:
+        except Exception:
             pass
 
     if settings.AI_SERVICE_URL:
@@ -323,7 +315,7 @@ async def ai_draft_grievance(
                 )
                 if resp.status_code == 200:
                     return GrievanceDraftResponse(**resp.json())
-        except Exception as e:
+        except Exception:
             pass
 
     return _fallback_draft(body.description, body.category)
@@ -357,7 +349,7 @@ Return ONLY a JSON with:
 
 
 def _fallback_draft(description: str, category: Optional[str]) -> GrievanceDraftResponse:
-    lines = [l.strip() for l in description.split("\n") if l.strip()]
+    lines = [line.strip() for line in description.split("\n") if line.strip()]
     subject = lines[0][:100] if lines else "Grievance regarding government service"
     if len(subject) > 100:
         subject = subject[:97] + "..."

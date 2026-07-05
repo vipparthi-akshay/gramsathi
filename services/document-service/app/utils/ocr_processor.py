@@ -123,7 +123,7 @@ class OCRProcessor:
 
     def _extract_fields_from_text(self, text: str, document_type: str) -> Dict[str, str]:
         fields = {}
-        lines = [l.strip() for l in text.split("\n") if l.strip()]
+        lines = [line.strip() for line in text.split("\n") if line.strip()]
         expected = FIELD_EXTRACTORS.get(document_type, [])
         for i, line in enumerate(lines):
             for field in expected:

@@ -57,7 +57,7 @@ async def check_eligibility(
     db: AsyncSession = Depends(get_db_session),
 ):
     result = await db.execute(
-        select(Scheme).where(Scheme.id == request.scheme_id, Scheme.is_deleted == False)
+        select(Scheme).where(Scheme.id == request.scheme_id, Scheme.is_deleted.is_(False))
     )
     scheme = result.scalar_one_or_none()
     if not scheme:
@@ -86,7 +86,7 @@ async def batch_check_eligibility(
     result = await db.execute(
         select(Scheme).where(
             Scheme.id.in_(request.scheme_ids),
-            Scheme.is_deleted == False,
+            Scheme.is_deleted.is_(False),
         )
     )
     schemes = result.scalars().all()
@@ -120,7 +120,7 @@ async def get_criteria_explanation(
     db: AsyncSession = Depends(get_db_session),
 ):
     result = await db.execute(
-        select(Scheme).where(Scheme.id == scheme_id, Scheme.is_deleted == False)
+        select(Scheme).where(Scheme.id == scheme_id, Scheme.is_deleted.is_(False))
     )
     scheme = result.scalar_one_or_none()
     if not scheme:
