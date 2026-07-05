@@ -183,8 +183,6 @@ class NotificationSender:
         try:
             loop = asyncio.get_event_loop()
             if loop.is_running():
-                from sqlalchemy import select as sa_select
-                import asyncio as _asyncio
                 return ("Notification", "You have a new update.")
             return loop.run_until_complete(_render())
         except RuntimeError:

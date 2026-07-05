@@ -48,7 +48,10 @@ class NotificationSendRequest(BaseModel):
     citizen_id: uuid.UUID
     type: str = Field(
         ...,
-        pattern=r"^(application_update|scheme_alert|deadline_reminder|payment_confirmation|grievance_update|welcome|system)$",
+        pattern=(
+            r"^(application_update|scheme_alert|deadline_reminder|"
+            r"payment_confirmation|grievance_update|welcome|system)$"
+        ),
     )
     title: str = Field(..., max_length=500)
     body: str = Field(..., max_length=5000)
@@ -82,7 +85,10 @@ class TemplateCreate(BaseModel):
     name: str = Field(..., max_length=200)
     type: str = Field(
         ...,
-        pattern=r"^(application_update|scheme_alert|deadline_reminder|payment_confirmation|grievance_update|welcome|system)$",
+        pattern=(
+            r"^(application_update|scheme_alert|deadline_reminder|"
+            r"payment_confirmation|grievance_update|welcome|system)$"
+        ),
     )
     title_template: str = Field(..., max_length=500)
     body_template: str = Field(..., max_length=5000)

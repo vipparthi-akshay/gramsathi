@@ -1,7 +1,5 @@
 import uuid
 from datetime import datetime, timezone
-from typing import Optional
-
 from fastapi import APIRouter, Depends, HTTPException, Request, UploadFile, File, Form, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -12,7 +10,6 @@ from app.models.document import Document
 from app.schemas.document import (
     AutoFillRequest,
     AutoFillResponse,
-    DocumentList,
     DocumentOut,
     DocumentUploadResponse,
     DocumentVerifyRequest,
