@@ -1,0 +1,100 @@
+{
+  "hindi": {
+    "bhojpuri": ["ka haal ba?", "tu kahan jaat hai?", "hum bhojpuri mein baat kareel", "bahut badhia, tu kaisan ba?", "o kariya kahan raheli?"],
+    "awadhi": ["kaise ho aap?", "ham jaat hain", "kahan se aawat hain?", "bahut achchha, aap kahan rahat hain?", "hamar naam Ram hai"],
+    "bundeli": ["kaise ho bhai?", "main jaa rahyo", "kahan rehata ho?", "kya karo ho aaj?", "bada maja aayo"],
+    "chhattisgarhi": ["kaise hain aap?", "main jaawe hoon", "han bhai, khub aagee", "tumhar kona naam he?", "hamaar gaon mein sab milke rahen"],
+    "haryanvi": ["ka se ho bhai?", "main jaan lagya hoon", "kade aayo?", "tanna ki khabar?", "bahut badhiya chora hai tu"],
+    "marwari": ["kikan ho?", "main jaa wau", "kaith aavya?", "apdani kya aadat hai?", "bhai sa, aaj bahut garmi hai"],
+    "braj": ["kaise ho?", "main jaa rayo", "kahan rahat ho?", "aaj bada din hai", "tumhar gaon kidhar hai?"],
+    "standard": ["aap kaise hain?", "main jaa raha hoon", "aap kahan se hain?", "kya aap meri madad kar sakte hain?", "mujhe ek aadhaar card chahiye"]
+  },
+  "marathi": {
+    "vidarbhi": ["kasa ahes?", "mi javar aahe", "kutha rahtos?", "tula kay pahije?", "bagh kiti sobat ahes?"],
+    "konkan": ["kaso asa?", "hānv vetan", "khoim ravta?", "tuka zayem?", "mhaka ek aadhaar khoxim zai"],
+    "varhadi": ["kasa ahas?", "me javar ahe", "kutha rahatas?", "tula kay pahije?", "mala pani pahije"],
+    "ahirani": ["kasa aisa?", "me jaaon aahe", "kadhi aala?", "thane kay karta?", "bara vait garmi aahe"],
+    "standard": ["kasa ahat?", "mi jato ahe", "aap kothe rahata?", "mala ek adhar card pahije", "aaple naav kay aahe?"]
+  },
+  "bengali": {
+    "standard": ["apni kemon achen?", "ami jacchi", "apnar naam ki?", "amake ekta aadhar card chai", "kothay thaken?"],
+    "sylheti": ["afne kemon asos?", "ami jairam", "afnar nam kita?", "amare ekta adhar card lage", "kuwai thakos?"],
+    "chittagonian": ["tui kemon asos?", "ami jai", "twar naam kita?", "ammare adhar card char", "honde thakos?"],
+    "rajbanshi": ["apni kemon achen?", "ami jaitasi", "apnar naam kisa?", "amak ekta aadhar darkar", "kot thaken?"]
+  },
+  "tamil": {
+    "standard": ["eppadi irukeenga?", "naan poren", "ungal peyar enna?", "enakku oru aadhaar aavasiyam", "enga irukeenga?"],
+    "chennai": ["eppadi iruka?", "da naan polan", "unge peru innu?", "naan veetuku pooren", "eppa vantha?"],
+    "madurai": ["eppadi irukeenga?", "naan poval", "onga per enna?", "aadhar card venum naakku", "enga irukeenga?"],
+    "coimbatore": ["eppadi irukeenga?", "naan pooren", "ungal peru enna?", "aadhaar venum", "enga irukeenga?"],
+    "sri_lankan": ["eppadi irukkingal?", "naan poven", "ungal peyar ennavenum?", "enakku oru aadhar avasiyam", "engay irukkingal?"]
+  },
+  "telugu": {
+    "standard": ["ela unnaru?", "nannu veltunnanu", "mee perenti?", "naaku aadhar card kavali", "ekkada untaru?"],
+    "telangana": ["ela unnaav?", "nu veltunna", "ni perenti?", "naaku aadhar kaavaali", "ekada unnav?"],
+    "rayalaseema": ["ela unnaru?", "nannu veltaamu", "meeru perenti?", "aadhar pettukovali naaku", "ekkada untaaru?"]
+  },
+  "gujarati": {
+    "saurashtra": ["kem chho?", "hu jav cho", "taru naam shu?", "mane aadhar joie", "kya reho chho?"],
+    "ahmedabad": ["kem chho?", "hu jaish", "taru naam shu?", "mane aadhar card josh", "kya rahe che?"],
+    "standard": ["kem chho?", "hu jav chhu", "tamaru naam shu?", "mane ek aadhar card joie", "kya raho chho?"]
+  },
+  "kannada": {
+    "standard": ["hegiddira?", "naanu hoguttiddene", "nimma hesarenu?", "nanage aadhar card beku", "elli irtira?"],
+    "north_karnataka": ["hegiddiro?", "naanu hortini", "nimma hesar yenu?", "aadhar beku nanage", "eli irtiro?"],
+    "dakshina_kannada": ["byara ulla?", "naan poon", "nimma pudar encha?", "nanak aadhar bodchu", "vootala ulla?"]
+  },
+  "malayalam": {
+    "standard": ["sukhamano?", "njan pokunnu", "ningalude peru entha?", "enikku aadhaar venam", "evideyanu thamasam?"],
+    "kasaragod": ["sukhamono?", "njan poka", "nimma peru enta?", "aadhar venam enik", "evide tamasam?"],
+    "thiruvananthapuram": ["sukhamano?", "njan pokunnu", "ningal peru entha?", "aadhar veno", "evidunnu?"]
+  },
+  "punjabi": {
+    "majhi": ["ki haal hai?", "main jaa reha hoon", "tera naam ki hai?", "menu aadhar card chahida", "kithon aaye ho?"],
+    "doabi": ["kidhan?", "main jaan lagga", "teran naam ki aa?", "menu aadhar chaida", "kadon aaye ho?"],
+    "malwai": ["ki haal ji?", "main jaa reha", "teran naam ki aa?", "menu aadhar card ohneed", "kithon aa rahe ho?"]
+  },
+  "odia": {
+    "standard": ["kemiti achha?", "mu jaechi", "aapana nama kana?", "mu adhara karta darkar", "kouthi rahunthichha?"],
+    "sambalpuri": ["kiso achha?", "mu jay maun", "tor naam kiso?", "mu aadhar darkar kare", "kithi rahunthu?"],
+    "balasore": ["kemiti acha?", "mu jama", "toma nama kana?", "aadhar lagibe mo", "kouthi rahucha?"]
+  },
+  "assamese": {
+    "standard": ["kene aase?", "muk aadhar card lagibo", "aapunar naam ki?", "muk jabo lagibo", "kothai aase?"],
+    "kamrupi": ["kene aasa?", "moi aadhar lagibo", "tumar naam ki?", "moi jaba lagibo", "kothai aasa?"]
+  },
+  "urdu": {
+    "dakhini": ["kaise ho?", "main jaa raha hoon", "tumhara naam kya hai?", "mujhe aadhar card chahiye", "kahan se ho?"],
+    "lucknowi": ["aap kaise hain?", "main jaa raha hoon", "aapka naam kya hai?", "mujhe aadhar card darkar hai", "tashreef kahan hai?"],
+    "standard": ["aap kaise hain?", "main jaa raha hoon", "aapka naam kya hai?", "mujhe ek aadhar card chahiye", "aap kahan rehte hain?"]
+  },
+  "maithili": {
+    "standard": ["kechh hain?", "hun jaait chhi", "taan naam ki?", "humra aadhar chaai", "kahan rahait chhi?"]
+  },
+  "santali": {
+    "standard": ["seda tushul den?", "ini jok kana", "ama nudi okare?", "adhar kagaj daram", "oka re tala gasa ge?"]
+  },
+  "kashmiri": {
+    "standard": ["kyechi koran?", "bô yichan", "tsôngy nami kya?", "aadhare kartêt che dharurt", "katyi cuhiv?"],
+    "srinagar": ["kyechi chhukh?", "bi yichi", "tsong nami kheer?", "aadhar che adzarot", "katy chhukh?"]
+  },
+  "nepali": {
+    "standard": ["tapailai kasto cha?", "ma jadai chu", "tapaaiko naam ke ho?", "malaai aadhar card chahiyo", "kahan basnu hunchha?"]
+  },
+  "sindhi": {
+    "standard": ["keh hal aahyo?", "man wenyu pya", "tawhanjo na'aro chha?", "mukhe aadhar kape", "kithan aahe?"]
+  },
+  "konkani": {
+    "goan": ["kaso assa?", "háv veta", "tuje namv kitem?", "maka aadhar kagad zai", "khoim ravta?"],
+    "karwari": ["koso assa?", "hānv vetan", "tumbo nãv kite?", "aadhar kartam zain", "koñi ravtan?"]
+  },
+  "dogri": {
+    "standard": ["ke haal ne?", "main jaan lagga", "tera naam ke?", "muk aadhar chahida", "kithon aawan?"]
+  },
+  "bodo": {
+    "standard": ["ma khobor?", "ang gwjongdong", "nangni mungo ma?", "anga aadhar nongou", "bedung gosonim?"]
+  },
+  "manipuri": {
+    "standard": ["kum kemma leire?", "eina chatli", "nakki maming kari?", "eigi aadhar gn koyna", "kayi da leibage?"]
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "name": "gramsathi-ai",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI-Powered Multilingual Government Assistant for Rural Citizens",
+  "scripts": {
+    "dev": "node ./scripts/dev.js",
+    "dev:citizen": "cd apps/citizen-web && npm run dev",
+    "dev:admin": "cd apps/admin-web && npm run dev",
+    "dev:services": "docker-compose up -d",
+    "build": "npm run build:citizen && npm run build:admin",
+    "build:citizen": "cd apps/citizen-web && npm run build",
+    "build:admin": "cd apps/admin-web && npm run build",
+    "test": "npm run test:services && npm run test:citizen && npm run test:admin",
+    "test:services": "cd services && python -m pytest",
+    "test:citizen": "cd apps/citizen-web && npm run test",
+    "test:admin": "cd apps/admin-web && npm run test",
+    "lint": "cd apps/citizen-web && npm run lint && cd ../../apps/admin-web && npm run lint",
+    "format": "prettier --write 'apps/**/*.{ts,tsx,json}'",
+    "db:migrate": "cd services && alembic upgrade head",
+    "db:seed": "cd services && python -m scripts.seed_data",
+    "deploy:infra": "cd infrastructure/terraform && terraform apply",
+    "deploy:services": "cd infrastructure/k8s && kubectl apply -k overlays/prod",
+    "clean": "docker-compose down -v && rm -rf apps/*/node_modules services/*/__pycache__"
+  },
+  "workspaces": [
+    "apps/citizen-web",
+    "apps/admin-web"
+  ]
+}

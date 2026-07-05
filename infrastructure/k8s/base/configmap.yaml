@@ -1,0 +1,96 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gramsathi-config
+  namespace: gramsathi
+  labels:
+    app.kubernetes.io/name: gramsathi
+    app.kubernetes.io/component: config
+    app.kubernetes.io/part-of: gramsathi-ai
+data:
+  LOG_LEVEL: "info"
+  APP_ENV: "production"
+  API_VERSION: "v1"
+  API_PREFIX: "/api/v1"
+  APP_NAME: "GramSathi"
+  APP_LOCALE: "en_IN"
+  DEFAULT_LANGUAGE: "hi"
+  SUPPORTED_LANGUAGES: "hi,bn,ta,te,mr,gu,kn,ml,or,pa,as,en"
+  TIMEZONE: "Asia/Kolkata"
+  CORS_ORIGINS: "https://gramsathi.ai"
+  DB_MAX_CONNECTIONS: "50"
+  DB_POOL_TIMEOUT: "30"
+  DB_IDLE_TIMEOUT: "300"
+  REDIS_MAX_RETRIES: "10"
+  REDIS_RETRY_DELAY: "1000"
+  REDIS_CONNECT_TIMEOUT: "10000"
+  CACHE_TTL_DEFAULT: "300"
+  CACHE_TTL_SESSION: "3600"
+  CACHE_TTL_SCHEMES: "600"
+  CACHE_TTL_TRANSLATIONS: "86400"
+  UPLOAD_MAX_SIZE: "52428800"
+  UPLOAD_ALLOWED_TYPES: "application/pdf,image/jpeg,image/png,image/tiff"
+  RATE_LIMIT_WINDOW: "60"
+  RATE_LIMIT_MAX_REQUESTS: "100"
+  DOCUMENT_RETENTION_DAYS: "365"
+  SESSION_TIMEOUT_MINUTES: "60"
+  MAX_LOGIN_ATTEMPTS: "5"
+  LOCKOUT_DURATION_MINUTES: "15"
+  OTP_EXPIRY_SECONDS: "300"
+  OTP_RESEND_COOLDOWN: "120"
+  ML_MODEL_CACHE_SIZE: "5"
+  ML_INFERENCE_TIMEOUT: "30000"
+  ML_BATCH_SIZE: "32"
+  ML_MAX_SEQUENCE_LENGTH: "512"
+  ML_CONFIDENCE_THRESHOLD: "0.85"
+  FEATURE_FLAG_DOCUMENT_OCR: "true"
+  FEATURE_FLAG_VOICE_INPUT: "true"
+  FEATURE_FLAG_AUTO_TRANSLATE: "true"
+  FEATURE_FLAG_OFFLINE_MODE: "false"
+  METRICS_ENABLED: "true"
+  METRICS_PREFIX: "gramsathi"
+  TRACING_ENABLED: "true"
+  TRACING_SAMPLE_RATE: "0.1"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gramsathi-ai-config
+  namespace: gramsathi
+  labels:
+    app.kubernetes.io/name: gramsathi
+    app.kubernetes.io/component: ai-config
+    app.kubernetes.io/part-of: gramsathi-ai
+data:
+  AI_MODEL_NAME: "gramsathi-llm-v1"
+  AI_MODEL_BASE_PATH: "/models"
+  AI_TOKENIZER_PATH: "/models/tokenizer"
+  AI_MAX_INPUT_LENGTH: "4096"
+  AI_MAX_OUTPUT_LENGTH: "1024"
+  AI_TEMPERATURE: "0.7"
+  AI_TOP_P: "0.9"
+  AI_TOP_K: "50"
+  AI_REPETITION_PENALTY: "1.1"
+  AI_NUM_BEAMS: "4"
+  AI_USE_QUANTIZATION: "true"
+  AI_CUDA_DEVICES: "0"
+  AI_GRPC_PORT: "50051"
+  AI_REST_PORT: "8080"
+  AI_WORKERS: "4"
+  AI_MAX_BATCH_SIZE: "64"
+  AI_PREFETCH_SIZE: "16"
+  AI_CACHE_ENABLED: "true"
+  AI_CACHE_SIZE: "1000"
+  AI_CACHE_TTL: "3600"
+  TRANSLATION_MODEL: "nmt-en-hi-v2"
+  TRANSLATION_BEAM_SIZE: "5"
+  TRANSLATION_MAX_LENGTH: "256"
+  TRANSLATION_CACHE_ENABLED: "true"
+  TRANSLATION_CACHE_SIZE: "5000"
+  ASR_MODEL: "wav2vec2-hindi-v1"
+  ASR_SAMPLE_RATE: "16000"
+  ASR_LANGUAGE: "hi"
+  TTS_MODEL: "fastspeech2-hindi-v1"
+  TTS_SAMPLE_RATE: "22050"
+  OCR_MODEL: "trocr-hindi-v1"
+  OCR_LANGUAGE: "hi"

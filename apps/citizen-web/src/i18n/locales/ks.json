@@ -1,0 +1,12 @@
+﻿{
+  "common": { "appName": "گرام ساتھی AI", "loading": "Loading...", "error": "Error", "retry": "Retry", "cancel": "Cancel", "confirm": "Confirm", "save": "Save", "delete": "Delete", "edit": "Edit", "submit": "Submit", "close": "Close", "back": "Back", "next": "Next", "search": "Search", "share": "Share", "selectLanguage": "Select Language", "darkMode": "Dark Mode", "lightMode": "Light Mode", "notifications": "Notifications", "welcome": "Welcome", "greeting": "Hello" },
+  "navigation": { "home": "Home", "aiAssistant": "AI Assistant", "schemes": "Schemes", "applications": "Applications", "documents": "Documents", "grievances": "Grievances", "profile": "Profile", "logout": "Logout" },
+  "home": { "greetingUser": "Hello, {{name}}!", "quickActions": "Quick Actions", "voiceSearch": "Voice Search", "activeApplications": "Active Applications" },
+  "ai": { "gramBot": "GramBot", "askQuestion": "Ask me about schemes", "send": "Send", "listening": "Listening..." },
+  "schemes": { "title": "Schemes", "agriculture": "Agriculture", "education": "Education", "health": "Health", "applyNow": "Apply Now" },
+  "applications": { "title": "My Applications", "status": "Status" },
+  "documents": { "title": "Documents", "aadhaarCard": "Aadhaar Card" },
+  "grievances": { "title": "Grievances", "fileComplaint": "File Complaint" },
+  "profile": { "title": "My Profile" },
+  "errors": { "genericError": "Something went wrong" }
+}

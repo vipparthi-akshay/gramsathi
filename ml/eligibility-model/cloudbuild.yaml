@@ -1,0 +1,72 @@
+steps:
+  # Step 1: Build custom training container
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -t
+      - us-central1-docker.pkg.dev/${PROJECT_ID}/gram-sathi/eligibility-trainer:${SHORT_SHA}
+      - -f
+      - trainer/Dockerfile
+      - .
+
+  # Step 2: Push container to Artifact Registry
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - us-central1-docker.pkg.dev/${PROJECT_ID}/gram-sathi/eligibility-trainer:${SHORT_SHA}
+
+  # Step 3: Submit Vertex AI custom training job
+  - name: gcr.io/cloud-builders/gcloud
+    entrypoint: python
+    args:
+      - -m
+      - trainer.train
+    env:
+      - AIP_MODEL_DIR=/gcs/${_BUCKET_NAME}/models/eligibility/${SHORT_SHA}
+      - AIP_DATA_FORMAT=csv
+      - AIP_TRAINING_DATA_URI=gs://${_BUCKET_NAME}/data/training/eligibility_data.csv
+      - AIP_VALIDATION_DATA_URI=gs://${_BUCKET_NAME}/data/validation/eligibility_data.csv
+
+  # Step 4: Create/update Vertex AI model and deploy endpoint
+  - name: gcr.io/cloud-builders/gcloud
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        MODEL_NAME="eligibility_model_${SHORT_SHA}"
+        gcloud ai models upload \
+          --region=us-central1 \
+          --display-name=$${MODEL_NAME} \
+          --artifact-uri=gs://${_BUCKET_NAME}/models/eligibility/${SHORT_SHA} \
+          --container-image-uri=us-central1-docker.pkg.dev/${PROJECT_ID}/gram-sathi/eligibility-trainer:${SHORT_SHA}
+
+        ENDPOINT_NAME="eligibility-endpoint"
+        EXISTING_ENDPOINT=$(gcloud ai endpoints list \
+          --region=us-central1 \
+          --filter=display_name=$${ENDPOINT_NAME} \
+          --format="value(name)" \
+          --limit=1)
+
+        if [ -z "$${EXISTING_ENDPOINT}" ]; then
+          gcloud ai endpoints create \
+            --region=us-central1 \
+            --display-name=$${ENDPOINT_NAME}
+        fi
+
+        gcloud ai endpoints deploy-model $${EXISTING_ENDPOINT} \
+          --region=us-central1 \
+          --model=$${MODEL_NAME} \
+          --display-name=$${MODEL_NAME} \
+          --traffic-split=0=100 \
+          --machine-type=n1-standard-4 \
+          --min-replica-count=1 \
+          --max-replica-count=5
+
+substitutions:
+  _BUCKET_NAME: gram-sathi-ml-models
+
+options:
+  machineType: E2_HIGHCPU_8
+  logging: CLOUD_LOGGING_ONLY
+
+timeout: 3600s

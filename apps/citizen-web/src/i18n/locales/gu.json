@@ -1,0 +1,12 @@
+{
+  "common": { "appName": "ગ્રામસાથી AI", "appTagline": "AI-સંચાલિત સરકારી સેવાઓ", "loading": "લોડ થઈ રહ્યું છે...", "error": "કંઈક ખોટું થયું", "retry": "ફરી પ્રયાસ કરો", "cancel": "રદ કરો", "confirm": "પુષ્ટિ કરો", "save": "સાચવો", "delete": "કાઢી નાખો", "edit": "સંપાદિત કરો", "submit": "સબમિટ કરો", "close": "બંધ કરો", "back": "પાછળ જાઓ", "next": "આગળ", "search": "શોધો", "share": "શેર કરો", "selectLanguage": "ભાષા પસંદ કરો", "changeLanguage": "ભાષા બદલો", "darkMode": "ડાર્ક મોડ", "lightMode": "લાઇટ મોડ", "notifications": "સૂચનાઓ", "welcome": "સ્વાગત છે", "greeting": "નમસ્તે" },
+  "navigation": { "home": "હોમ", "aiAssistant": "AI સહાયક", "schemes": "યોજનાઓ", "applications": "અરજીઓ", "documents": "દસ્તાવેજો", "grievances": "ફરિયાદો", "profile": "પ્રોફાઇલ", "notifications": "સૂચનાઓ", "logout": "લૉગઆઉટ" },
+  "home": { "greetingUser": "નમસ્તે, {{name}}!", "quickActions": "ઝડપી ક્રિયાઓ", "voiceSearch": "વૉઇસ શોધ", "activeApplications": "સક્રિય અરજીઓ", "recommendedSchemes": "તમારા માટે ભલામણ" },
+  "ai": { "gramBot": "ગ્રામબોટ", "askQuestion": "સરકારી યોજનાઓ વિશે મને પૂછો", "send": "મોકલો", "listening": "સાંભળી રહ્યું છે...", "tapToSpeak": "બોલવા માટે ટેપ કરો" },
+  "schemes": { "title": "સરકારી યોજનાઓ", "agriculture": "કૃષિ", "education": "શિક્ષણ", "health": "આરોગ્ય", "housing": "આવાસ", "employment": "રોજગાર", "applyNow": "હવે અરજી કરો" },
+  "applications": { "title": "મારી અરજીઓ", "status": "સ્થિતિ" },
+  "documents": { "title": "દસ્તાવેજ કેન્દ્ર", "aadhaarCard": "આધાર કાર્ડ" },
+  "grievances": { "title": "ફરિયાદો", "fileComplaint": "ફરિયાદ નોંધાવો" },
+  "profile": { "title": "મારી પ્રોફાઇલ" },
+  "errors": { "genericError": "કંઈક ખોટું થયું. ફરી પ્રયાસ કરો" }
+}

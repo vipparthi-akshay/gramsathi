@@ -1,0 +1,134 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: gramsathi
+      POSTGRES_USER: gramsathi
+      POSTGRES_PASSWORD: gramsathi-dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gramsathi"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  auth-service:
+    build: ./services/auth-service
+    ports:
+      - "8001:8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://gramsathi:gramsathi-dev@postgres:5432/gramsathi
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET_KEY: dev-secret-key-change-in-prod
+      APP_ENV: development
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  citizen-service:
+    build: ./services/citizen-service
+    ports:
+      - "8002:8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://gramsathi:gramsathi-dev@postgres:5432/gramsathi
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  ai-service:
+    build: ./services/ai-service
+    ports:
+      - "8003:8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://gramsathi:gramsathi-dev@postgres:5432/gramsathi
+      REDIS_URL: redis://redis:6379
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-dev-key}
+      GEMINI_MODEL: gemini-1.5-pro
+      GEMINI_FLASH_MODEL: gemini-1.5-flash
+      GOOGLE_APPLICATION_CREDENTIALS: /app/service-account.json
+      APP_ENV: development
+    volumes:
+      - ./service-account.json:/app/service-account.json:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  scheme-service:
+    build: ./services/scheme-service
+    ports:
+      - "8004:8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://gramsathi:gramsathi-dev@postgres:5432/gramsathi
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  document-service:
+    build: ./services/document-service
+    ports:
+      - "8005:8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://gramsathi:gramsathi-dev@postgres:5432/gramsathi
+      DOCUMENTS_BUCKET: gramsathi-documents-dev
+      GOOGLE_APPLICATION_CREDENTIALS: /app/service-account.json
+    volumes:
+      - ./service-account.json:/app/service-account.json:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  grievance-service:
+    build: ./services/grievance-service
+    ports:
+      - "8006:8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://gramsathi:gramsathi-dev@postgres:5432/gramsathi
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  notification-service:
+    build: ./services/notification-service
+    ports:
+      - "8007:8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://gramsathi:gramsathi-dev@postgres:5432/gramsathi
+      FIREBASE_PROJECT_ID: gramsathi-dev
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  analytics-service:
+    build: ./services/analytics-service
+    ports:
+      - "8008:8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://gramsathi:gramsathi-dev@postgres:5432/gramsathi
+      BIGQUERY_DATASET: gramsathi_analytics
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pgdata:

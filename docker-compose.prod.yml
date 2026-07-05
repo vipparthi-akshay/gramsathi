@@ -1,0 +1,349 @@
+# GramSathi AI — Production Docker Compose
+# Usage: docker compose -f docker-compose.prod.yml up -d
+# Requires: .env.production file with secrets
+
+version: "3.9"
+
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+x-healthcheck: &healthcheck
+  interval: 30s
+  timeout: 10s
+  retries: 3
+  start_period: 40s
+
+networks:
+  gramsathi-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.0.0/24
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: gramsathi-postgres
+    environment:
+      POSTGRES_DB: gramsathi
+      POSTGRES_USER: gramsathi
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    deploy:
+      resources:
+        limits:
+          cpus: "4"
+          memory: 8G
+        reservations:
+          cpus: "2"
+          memory: 4G
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gramsathi -d gramsathi"]
+      <<: *healthcheck
+    restart: unless-stopped
+    logging: *default-logging
+    networks:
+      - gramsathi-net
+
+  postgres-replica:
+    image: postgres:15-alpine
+    container_name: gramsathi-postgres-replica
+    environment:
+      POSTGRES_DB: gramsathi
+      POSTGRES_USER: gramsathi
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_PRIMARY_HOST: postgres
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - pgdata-replica:/var/lib/postgresql/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: "4"
+          memory: 8G
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gramsathi -d gramsathi"]
+      <<: *healthcheck
+    restart: unless-stopped
+    logging: *default-logging
+    profiles:
+      - replica
+    networks:
+      - gramsathi-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: gramsathi-redis
+    command: >
+      redis-server
+      --requirepass ${REDIS_PASSWORD}
+      --appendonly yes
+      --maxmemory 2gb
+      --maxmemory-policy allkeys-lru
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - redis-data:/data
+    deploy:
+      resources:
+        limits:
+          memory: 2.5G
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      <<: *healthcheck
+    restart: unless-stopped
+    logging: *default-logging
+    networks:
+      - gramsathi-net
+
+  auth-service: &service-base
+    build:
+      context: ./services/auth-service
+      dockerfile: Dockerfile
+    container_name: gramsathi-auth
+    environment:
+      DATABASE_URL: postgresql+asyncpg://gramsathi:${DB_PASSWORD}@postgres:5432/gramsathi
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      JWT_ALGORITHM: HS256
+      JWT_ACCESS_TOKEN_EXPIRE_MINUTES: 15
+      JWT_REFRESH_TOKEN_EXPIRE_DAYS: 7
+      OTP_EXPIRY_SECONDS: 300
+      OTP_PROVIDER: ${OTP_PROVIDER}
+      MSG91_AUTH_KEY: ${MSG91_AUTH_KEY}
+      APP_ENV: production
+      APP_LOG_LEVEL: WARNING
+      OTEL_SERVICE_NAME: auth-service
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT}
+    expose:
+      - "8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      <<: *healthcheck
+    restart: unless-stopped
+    logging: *default-logging
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+        reservations:
+          cpus: "0.5"
+          memory: 256M
+    networks:
+      - gramsathi-net
+
+  citizen-service:
+    <<: *service-base
+    build:
+      context: ./services/citizen-service
+    container_name: gramsathi-citizen
+    environment:
+      DATABASE_URL: postgresql+asyncpg://gramsathi:${DB_PASSWORD}@postgres:5432/gramsathi
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
+      APP_ENV: production
+      APP_LOG_LEVEL: WARNING
+
+  ai-service:
+    <<: *service-base
+    build:
+      context: ./services/ai-service
+    container_name: gramsathi-ai
+    environment:
+      DATABASE_URL: postgresql+asyncpg://gramsathi:${DB_PASSWORD}@postgres:5432/gramsathi
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      GEMINI_MODEL: gemini-1.5-pro
+      GEMINI_FLASH_MODEL: gemini-1.5-flash
+      GEMINI_MAX_TOKENS: 8192
+      GEMINI_TEMPERATURE: 0.3
+      SPEECH_LANGUAGE_CODE: hi-IN
+      SPEECH_ENCODING: LINEAR16
+      SPEECH_SAMPLE_RATE: 16000
+      APP_ENV: production
+      APP_LOG_LEVEL: WARNING
+    volumes:
+      - ${GCP_SERVICE_ACCOUNT_PATH}:/app/service-account.json:ro
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 2G
+          nvidia.com/gpu: 0  # Set to 1 if GPU needed for inference
+        reservations:
+          cpus: "1"
+          memory: 1G
+
+  scheme-service:
+    <<: *service-base
+    build:
+      context: ./services/scheme-service
+    container_name: gramsathi-scheme
+    environment:
+      DATABASE_URL: postgresql+asyncpg://gramsathi:${DB_PASSWORD}@postgres:5432/gramsathi
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
+      APP_ENV: production
+      APP_LOG_LEVEL: WARNING
+
+  document-service:
+    <<: *service-base
+    build:
+      context: ./services/document-service
+    container_name: gramsathi-document
+    environment:
+      DATABASE_URL: postgresql+asyncpg://gramsathi:${DB_PASSWORD}@postgres:5432/gramsathi
+      GOOGLE_CLOUD_PROJECT: ${GOOGLE_CLOUD_PROJECT}
+      GCS_DOCUMENTS_BUCKET: ${GCS_DOCUMENTS_BUCKET}
+      GCS_EXPIRATION_MINUTES: 30
+      APP_ENV: production
+      APP_LOG_LEVEL: WARNING
+    volumes:
+      - ${GCP_SERVICE_ACCOUNT_PATH}:/app/service-account.json:ro
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+
+  grievance-service:
+    <<: *service-base
+    build:
+      context: ./services/grievance-service
+    container_name: gramsathi-grievance
+    environment:
+      DATABASE_URL: postgresql+asyncpg://gramsathi:${DB_PASSWORD}@postgres:5432/gramsathi
+      APP_ENV: production
+      APP_LOG_LEVEL: WARNING
+
+  notification-service:
+    <<: *service-base
+    build:
+      context: ./services/notification-service
+    container_name: gramsathi-notification
+    environment:
+      DATABASE_URL: postgresql+asyncpg://gramsathi:${DB_PASSWORD}@postgres:5432/gramsathi
+      FIREBASE_PROJECT_ID: ${FIREBASE_PROJECT_ID}
+      FIREBASE_PRIVATE_KEY: ${FIREBASE_PRIVATE_KEY}
+      FIREBASE_CLIENT_EMAIL: ${FIREBASE_CLIENT_EMAIL}
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN}
+      TWILIO_WHATSAPP_NUMBER: ${TWILIO_WHATSAPP_NUMBER}
+      APP_ENV: production
+      APP_LOG_LEVEL: WARNING
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  analytics-service:
+    <<: *service-base
+    build:
+      context: ./services/analytics-service
+    container_name: gramsathi-analytics
+    environment:
+      DATABASE_URL: postgresql+asyncpg://gramsathi:${DB_PASSWORD}@postgres:5432/gramsathi
+      BIGQUERY_DATASET: ${BIGQUERY_DATASET}
+      BIGQUERY_LOCATION: asia-south1
+      APP_ENV: production
+      APP_LOG_LEVEL: WARNING
+    volumes:
+      - ${GCP_SERVICE_ACCOUNT_PATH}:/app/service-account.json:ro
+
+  # ─── Reverse Proxy ──────────────────────────────────
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: gramsathi-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/nginx/conf.d/:/etc/nginx/conf.d/:ro
+      - ./ssl:/etc/nginx/ssl:ro
+      - ./docker/nginx/security-headers.conf:/etc/nginx/security-headers.conf:ro
+    depends_on:
+      - auth-service
+      - citizen-service
+      - ai-service
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 60s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+    logging: *default-logging
+    networks:
+      - gramsathi-net
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 256M
+
+  # ─── Worker ─────────────────────────────────────────
+  worker:
+    build:
+      context: ./services/auth-service  # Shared worker image
+      dockerfile: Dockerfile.worker
+    container_name: gramsathi-worker
+    command: ["celery", "-A", "tasks", "worker", "--loglevel=warning", "--concurrency=4"]
+    environment:
+      DATABASE_URL: postgresql+asyncpg://gramsathi:${DB_PASSWORD}@postgres:5432/gramsathi
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    logging: *default-logging
+    networks:
+      - gramsathi-net
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 1G
+    profiles:
+      - worker
+
+  # ─── Backup ─────────────────────────────────────────
+  pg-backup:
+    image: postgres:15-alpine
+    container_name: gramsathi-pg-backup
+    entrypoint: |
+      sh -c '
+        PGPASSWORD=${DB_PASSWORD} pg_dump -h postgres -U gramsathi gramsathi > /backups/gramsathi_$$(date +%Y%m%d_%H%M%S).sql &&
+        echo "Backup completed: gramsathi_$$(date +%Y%m%d_%H%M%S).sql"
+      '
+    environment:
+      DB_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - ./backups:/backups
+    depends_on:
+      postgres:
+        condition: service_healthy
+    profiles:
+      - backup
+    networks:
+      - gramsathi-net
+
+volumes:
+  pgdata:
+  pgdata-replica:
+  redis-data:

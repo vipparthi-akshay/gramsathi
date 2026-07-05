@@ -1,0 +1,54 @@
+{
+  "common": {
+    "morningGreeting": "శుభోదయం",
+    "afternoonGreeting": "శుభాహ్నం",
+    "eveningGreeting": "శుభ సాయంత్రం",
+    "appName": "గ్రామసాథి AI",
+    "totalBenefits": "మొత్తం ప్రయోజనాలు",
+    "viewAll": "అన్నింటిని వీక్షించండి"
+  },
+  "home": {
+    "activeApplications": "క్రియాశీల దరఖాస్తులు",
+    "findSchemes": "పథకాలను అన్వేషించండి",
+    "recentActivity": "తాజా నవీకరణలు",
+    "recommendedSchemes": "మీ కోసం సిఫార్సు చేయబడినవి"
+  },
+  "applications": {
+    "approved": "ఆమోదించబడింది",
+    "noApplications": "ఇంకా దరఖాస్తులు లేవు",
+    "viewDetails": "వివరాలు"
+  },
+  "documents": {
+    "pending": "పెండింగ్ పత్రాలు"
+  },
+  "schemes": {
+    "savedSchemes": "సేవ్ చేయబడిన పథకాలు",
+    "categories": "వర్గం వారీగా పథకాలు",
+    "agriculture": "వ్యవసాయం",
+    "employment": "ఉపాధి",
+    "health": "ఆరోగ్యం",
+    "housing": "గృహనిర్మాణం",
+    "financebanking": "ఫైనాన్స్ & బ్యాంకింగ్",
+    "applyNow": "దరఖాస్తు చేయండి",
+    "sortMatch": "మ్యాచ్"
+  },
+  "navigation": {
+    "home": "హోమ్",
+    "aiAssistant": "AI సహాయకుడు",
+    "schemes": "పథకాలు",
+    "grievances": "ఫిర్యాదులు",
+    "profile": "ప్రొఫైల్"
+  },
+  "login": {
+    "welcome": "గ్రామసాథి AI కి స్వాగతం",
+    "enterMobile": "మొబైల్ నంబర్‌ను నమోదు చేయండి",
+    "mobilePlaceholder": "10-అంకెల మొబైల్ నంబర్",
+    "sendOtp": "OTP పంపండి",
+    "enterOtp": "OTP నమోదు చేయండి",
+    "otpSent": "+91 కి OTP పంపబడింది",
+    "verifyOtp": "నిర్ధారించి లాగిన్ చేయండి",
+    "changeNumber": "నంబర్ మార్చండి",
+    "invalidMobile": "దయచేసి సరైన 10-అంకెల నంబర్‌ను నమోదు చేయండి",
+    "invalidOtp": "చెల్లని OTP. దయచేసి మళ్లీ ప్రయత్నించండి."
+  }
+}

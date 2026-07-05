@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gramsathi-config
+  namespace: gramsathi
+data:
+  LOG_LEVEL: "warn"
+  APP_ENV: "production"
+  RATE_LIMIT_MAX_REQUESTS: "100"
+  DB_MAX_CONNECTIONS: "100"
+  FEATURE_FLAG_OFFLINE_MODE: "false"
+  TRACING_SAMPLE_RATE: "0.05"

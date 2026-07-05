@@ -1,0 +1,4000 @@
+openapi: "3.0.3"
+info:
+  title: GramSathi AI API
+  description: |
+    AI-Powered Multilingual Government Assistant API for rural citizens in India.
+    Enables scheme discovery, application processing, document OCR, grievance filing,
+    notifications, and analytics across 22 Indian languages.
+  version: "1.0.0"
+  contact:
+    name: GramSathi Team
+    email: dev@gramsathi.ai
+  license:
+    name: Proprietary
+
+servers:
+  - url: https://api.gramsathi.ai/v1
+    description: Production server
+  - url: https://staging-api.gramsathi.ai/v1
+    description: Staging server
+  - url: http://localhost:8001/api/v1
+    description: Local development
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Access token obtained from /auth/otp/verify
+
+  schemas:
+    # Common
+    ErrorResponse:
+      type: object
+      properties:
+        detail:
+          type: string
+          description: Error message
+        request_id:
+          type: string
+          format: uuid
+          description: Unique request identifier for tracing
+      required:
+        - detail
+
+    PaginationParams:
+      type: object
+      properties:
+        page:
+          type: integer
+          minimum: 1
+          default: 1
+        page_size:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+
+    # Auth Schemas
+    OTPSendRequest:
+      type: object
+      required:
+        - mobile_number
+      properties:
+        mobile_number:
+          type: string
+          pattern: "^\\+?[1-9]\\d{9,14}$"
+          example: "+919876543210"
+          description: Mobile number with country code
+    OTPSendResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "OTP sent successfully"
+        expires_in:
+          type: integer
+          example: 300
+        debug_otp:
+          type: string
+          nullable: true
+          description: OTP value in development mode only
+    OTPVerifyRequest:
+      type: object
+      required:
+        - mobile_number
+        - otp
+      properties:
+        mobile_number:
+          type: string
+          pattern: "^\\+?[1-9]\\d{9,14}$"
+          example: "+919876543210"
+        otp:
+          type: string
+          minLength: 4
+          maxLength: 8
+          example: "123456"
+    OTPVerifyResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+          description: JWT access token
+        refresh_token:
+          type: string
+        token_type:
+          type: string
+          example: "bearer"
+        expires_in:
+          type: integer
+          example: 900
+        user:
+          $ref: "#/components/schemas/UserOut"
+    TokenRefreshRequest:
+      type: object
+      required:
+        - refresh_token
+      properties:
+        refresh_token:
+          type: string
+    TokenRefreshResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+        expires_in:
+          type: integer
+    LogoutRequest:
+      type: object
+      required:
+        - refresh_token
+      properties:
+        refresh_token:
+          type: string
+    UserOut:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        mobile_number:
+          type: string
+        name:
+          type: string
+          nullable: true
+        role:
+          type: string
+          enum: [citizen, admin, super_admin]
+        is_verified:
+          type: boolean
+        preferred_language:
+          type: string
+          example: "hi"
+        created_at:
+          type: string
+          format: date-time
+    UserUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 200
+        preferred_language:
+          type: string
+          maxLength: 10
+        role:
+          type: string
+          enum: [citizen, admin, super_admin]
+        is_active:
+          type: boolean
+    PaginatedUsers:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserOut"
+        total:
+          type: integer
+        page:
+          type: integer
+        page_size:
+          type: integer
+        total_pages:
+          type: integer
+
+    # Citizen Schemas
+    CitizenOut:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        date_of_birth:
+          type: string
+          format: date
+        gender:
+          type: string
+          enum: [male, female, transgender, other]
+        mobile_number:
+          type: string
+        state:
+          type: string
+        district:
+          type: string
+        tehsil:
+          type: string
+        village:
+          type: string
+        caste_category:
+          type: string
+          enum: [general, obc, sc, st, ews]
+        annual_income:
+          type: number
+        occupation:
+          type: string
+        education_level:
+          type: string
+        aadhaar_hash:
+          type: string
+          description: SHA-256 hash of Aadhaar number
+        preferred_language:
+          type: string
+        has_disability:
+          type: boolean
+        disability_type:
+          type: string
+          nullable: true
+        is_bpl:
+          type: boolean
+        is_farmer:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+    CitizenUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        date_of_birth:
+          type: string
+          format: date
+        gender:
+          type: string
+          enum: [male, female, transgender, other]
+        state:
+          type: string
+        district:
+          type: string
+        tehsil:
+          type: string
+        village:
+          type: string
+        caste_category:
+          type: string
+          enum: [general, obc, sc, st, ews]
+        annual_income:
+          type: number
+        occupation:
+          type: string
+        education_level:
+          type: string
+        preferred_language:
+          type: string
+        has_disability:
+          type: boolean
+        disability_type:
+          type: string
+          nullable: true
+        is_farmer:
+          type: boolean
+    CitizenSummary:
+      type: object
+      properties:
+        profile:
+          $ref: "#/components/schemas/CitizenOut"
+        active_applications_count:
+          type: integer
+        pending_documents_count:
+          type: integer
+    FamilyMemberCreate:
+      type: object
+      required:
+        - name
+        - relationship
+      properties:
+        name:
+          type: string
+          maxLength: 200
+        relationship:
+          type: string
+          enum: [spouse, child, parent, sibling, other]
+        date_of_birth:
+          type: string
+          format: date
+        gender:
+          type: string
+          enum: [male, female, transgender, other]
+        occupation:
+          type: string
+        annual_income:
+          type: number
+    FamilyMemberOut:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        citizen_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        relationship:
+          type: string
+        date_of_birth:
+          type: string
+          format: date
+          nullable: true
+        gender:
+          type: string
+          nullable: true
+        occupation:
+          type: string
+          nullable: true
+        annual_income:
+          type: number
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    # Scheme Schemas
+    SchemeOut:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        name_hindi:
+          type: string
+        description:
+          type: string
+        description_hindi:
+          type: string
+        category:
+          type: string
+        ministry:
+          type: string
+        department:
+          type: string
+        state_specific:
+          type: string
+          nullable: true
+        eligibility_criteria:
+          type: object
+        benefits:
+          type: string
+        required_documents:
+          type: array
+          items:
+            type: string
+        application_process:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    SchemeCreate:
+      type: object
+      required:
+        - name
+        - description
+        - category
+        - ministry
+      properties:
+        name:
+          type: string
+        name_hindi:
+          type: string
+        description:
+          type: string
+        description_hindi:
+          type: string
+        category:
+          type: string
+        ministry:
+          type: string
+        department:
+          type: string
+        state_specific:
+          type: string
+          nullable: true
+        eligibility_criteria:
+          type: object
+        benefits:
+          type: string
+        required_documents:
+          type: array
+          items:
+            type: string
+        application_process:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+    SchemeUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        name_hindi:
+          type: string
+        description:
+          type: string
+        description_hindi:
+          type: string
+        category:
+          type: string
+        ministry:
+          type: string
+        department:
+          type: string
+        state_specific:
+          type: string
+          nullable: true
+        eligibility_criteria:
+          type: object
+        benefits:
+          type: string
+        required_documents:
+          type: array
+          items:
+            type: string
+        application_process:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        is_active:
+          type: boolean
+    SchemeMatch:
+      type: object
+      properties:
+        scheme:
+          $ref: "#/components/schemas/SchemeOut"
+        match_score:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+        explanation:
+          type: string
+    CategoryOut:
+      type: object
+      properties:
+        category:
+          type: string
+        count:
+          type: integer
+    EligibilityCheckRequest:
+      type: object
+      required:
+        - citizen_id
+        - scheme_id
+      properties:
+        citizen_id:
+          type: string
+          format: uuid
+        scheme_id:
+          type: string
+          format: uuid
+    EligibilityCheckResult:
+      type: object
+      properties:
+        eligible:
+          type: boolean
+        score:
+          type: number
+          format: float
+        breakdown:
+          type: object
+        missing_requirements:
+          type: array
+          items:
+            type: string
+    EligibilityRequest:
+      type: object
+      required:
+        - citizen_id
+        - scheme_id
+      properties:
+        citizen_id:
+          type: string
+          format: uuid
+        scheme_id:
+          type: string
+          format: uuid
+    EligibilityResponse:
+      type: object
+      properties:
+        eligible:
+          type: boolean
+        score:
+          type: number
+          format: float
+        breakdown:
+          type: object
+        missing_requirements:
+          type: array
+          items:
+            type: string
+    BatchEligibilityRequest:
+      type: object
+      required:
+        - citizen_id
+        - scheme_ids
+      properties:
+        citizen_id:
+          type: string
+          format: uuid
+        scheme_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+    BatchEligibilityResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/EligibilityResponse"
+
+    # Application Schemas
+    ApplicationCreate:
+      type: object
+      required:
+        - citizen_id
+        - scheme_id
+        - form_data
+      properties:
+        citizen_id:
+          type: string
+          format: uuid
+        scheme_id:
+          type: string
+          format: uuid
+        form_data:
+          type: object
+        documents_submitted:
+          type: array
+          items:
+            type: string
+            format: uuid
+    ApplicationOut:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        citizen_id:
+          type: string
+          format: uuid
+        scheme_id:
+          type: string
+          format: uuid
+        form_data:
+          type: object
+        documents_submitted:
+          type: array
+          items:
+            type: string
+            format: uuid
+        status:
+          type: string
+          enum: [draft, submitted, under_review, approved, rejected, needs_info]
+        ai_summary:
+          type: string
+          nullable: true
+        government_ref_id:
+          type: string
+          nullable: true
+        rejection_reason:
+          type: string
+          nullable: true
+        processed_by:
+          type: string
+          nullable: true
+        submitted_at:
+          type: string
+          format: date-time
+          nullable: true
+        reviewed_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    ApplicationUpdate:
+      type: object
+      properties:
+        form_data:
+          type: object
+        documents_submitted:
+          type: array
+          items:
+            type: string
+            format: uuid
+    ApplicationReview:
+      type: object
+      properties:
+        ai_summary:
+          type: string
+    ApplicationApprove:
+      type: object
+      properties:
+        government_ref_id:
+          type: string
+    ApplicationReject:
+      type: object
+      required:
+        - rejection_reason
+      properties:
+        rejection_reason:
+          type: string
+    BulkApproveRequest:
+      type: object
+      required:
+        - application_ids
+      properties:
+        application_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        government_ref_id:
+          type: string
+
+    # Document Schemas
+    DocumentUploadResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        filename:
+          type: string
+        document_type:
+          type: string
+        file_size:
+          type: integer
+        ocr_result:
+          $ref: "#/components/schemas/OCRResult"
+    DocumentOut:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        citizen_id:
+          type: string
+          format: uuid
+        document_type:
+          type: string
+        original_filename:
+          type: string
+        file_size:
+          type: integer
+        mime_type:
+          type: string
+        ocr_extracted_data:
+          type: object
+          nullable: true
+        ocr_confidence:
+          type: number
+          nullable: true
+        ocr_processed_at:
+          type: string
+          format: date-time
+          nullable: true
+        verification_status:
+          type: string
+          enum: [pending, verified, rejected, needs_review]
+        verified_by:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+    DocumentList:
+      type: object
+      properties:
+        documents:
+          type: array
+          items:
+            $ref: "#/components/schemas/DocumentOut"
+        total:
+          type: integer
+        page:
+          type: integer
+        page_size:
+          type: integer
+    DocumentVerifyRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum: [verified, rejected]
+        verified_by:
+          type: string
+    AutoFillRequest:
+      type: object
+      required:
+        - citizen_id
+        - form_fields
+      properties:
+        citizen_id:
+          type: string
+          format: uuid
+        form_fields:
+          type: array
+          items:
+            type: string
+        document_types:
+          type: array
+          items:
+            type: string
+    AutoFillResponse:
+      type: object
+      properties:
+        filled_data:
+          type: object
+        missing_fields:
+          type: array
+          items:
+            type: string
+        confidence_score:
+          type: number
+          format: float
+    OCRResult:
+      type: object
+      properties:
+        raw_text:
+          type: string
+        extracted_fields:
+          type: object
+        confidence:
+          type: number
+          format: float
+        document_type:
+          type: string
+        processor_used:
+          type: string
+
+    # AI OCR Schemas
+    OCRProcessRequest:
+      type: object
+      required:
+        - image_base64
+        - document_type
+      properties:
+        image_base64:
+          type: string
+        document_type:
+          type: string
+          enum: [aadhaar, income_certificate, land_record, bank_passbook]
+    OCRProcessResponse:
+      type: object
+      properties:
+        document_type:
+          type: string
+        extracted_fields:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/OCRField"
+        overall_confidence:
+          type: number
+        needs_review:
+          type: boolean
+        flags:
+          type: array
+          items:
+            $ref: "#/components/schemas/OCRFlag"
+    OCRField:
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          type: string
+        confidence:
+          type: number
+        is_valid:
+          type: boolean
+    OCRFlag:
+      type: object
+      properties:
+        field:
+          type: string
+        severity:
+          type: string
+          enum: [warning, error, critical]
+        message:
+          type: string
+    OCRAnalyzeRequest:
+      type: object
+      required:
+        - document_type
+        - ocr_data
+        - purpose
+      properties:
+        document_type:
+          type: string
+        ocr_data:
+          type: object
+        purpose:
+          type: string
+    OCRAnalyzeResponse:
+      type: object
+      properties:
+        analysis:
+          type: string
+        flags:
+          type: array
+          items:
+            $ref: "#/components/schemas/OCRFlag"
+        suggestions:
+          type: array
+          items:
+            type: string
+        overall_confidence:
+          type: number
+
+    # Grievance Schemas
+    GrievanceCreate:
+      type: object
+      required:
+        - citizen_id
+        - category
+        - subject
+        - description
+      properties:
+        citizen_id:
+          type: string
+          format: uuid
+        category:
+          type: string
+          enum: [scheme_related, document_issue, payment_delay, staff_behavior, technical, other]
+        department:
+          type: string
+        subject:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+        original_language:
+          type: string
+          example: "hi"
+        priority:
+          type: string
+          enum: [low, medium, high, critical]
+          default: medium
+    GrievanceOut:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        citizen_id:
+          type: string
+          format: uuid
+        category:
+          type: string
+        department:
+          type: string
+          nullable: true
+        subject:
+          type: string
+        description:
+          type: string
+        original_language:
+          type: string
+          nullable: true
+        priority:
+          type: string
+        status:
+          type: string
+          enum: [draft, submitted, under_review, escalated, resolved, closed]
+        resolution_notes:
+          type: string
+          nullable: true
+        resolved_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    GrievanceUpdate:
+      type: object
+      properties:
+        category:
+          type: string
+        department:
+          type: string
+        subject:
+          type: string
+        description:
+          type: string
+        priority:
+          type: string
+    GrievanceDraftRequest:
+      type: object
+      required:
+        - description
+      properties:
+        description:
+          type: string
+        category:
+          type: string
+        original_language:
+          type: string
+          example: "hi"
+    GrievanceDraftResponse:
+      type: object
+      properties:
+        drafted_complaint:
+          type: string
+        category:
+          type: string
+        department:
+          type: string
+        subject:
+          type: string
+        priority:
+          type: string
+    ComplaintTrackingOut:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        grievance_id:
+          type: string
+          format: uuid
+        action:
+          type: string
+        action_by:
+          type: string
+          format: uuid
+        notes:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    # Notification Schemas
+    NotificationOut:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        citizen_id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: [scheme_alert, application_update, document_verification, grievance_update, general]
+        title:
+          type: string
+        body:
+          type: string
+        metadata:
+          type: object
+          nullable: true
+        is_read:
+          type: boolean
+        read_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+    NotificationPreferenceOut:
+      type: object
+      properties:
+        citizen_id:
+          type: string
+          format: uuid
+        push_enabled:
+          type: boolean
+        sms_enabled:
+          type: boolean
+        whatsapp_enabled:
+          type: boolean
+        email_enabled:
+          type: boolean
+        scheme_alerts:
+          type: boolean
+        application_updates:
+          type: boolean
+        grievance_updates:
+          type: boolean
+        promotional:
+          type: boolean
+        quiet_hours_start:
+          type: string
+          nullable: true
+        quiet_hours_end:
+          type: string
+          nullable: true
+    NotificationPreferenceUpdate:
+      type: object
+      properties:
+        push_enabled:
+          type: boolean
+        sms_enabled:
+          type: boolean
+        whatsapp_enabled:
+          type: boolean
+        email_enabled:
+          type: boolean
+        scheme_alerts:
+          type: boolean
+        application_updates:
+          type: boolean
+        grievance_updates:
+          type: boolean
+        promotional:
+          type: boolean
+        quiet_hours_start:
+          type: string
+          nullable: true
+        quiet_hours_end:
+          type: string
+          nullable: true
+    NotificationSendRequest:
+      type: object
+      required:
+        - citizen_id
+        - type
+        - title
+        - body
+      properties:
+        citizen_id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: [scheme_alert, application_update, document_verification, grievance_update, general]
+        title:
+          type: string
+          maxLength: 200
+        body:
+          type: string
+        delivery_channel:
+          type: string
+          enum: [in_app, sms, whatsapp, push, all]
+          default: in_app
+        metadata:
+          type: object
+    NotificationSendResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        delivery_status:
+          type: string
+          enum: [sent, failed]
+    BulkSendRequest:
+      type: object
+      required:
+        - citizen_ids
+        - type
+        - title
+        - body
+      properties:
+        citizen_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          maxItems: 1000
+        type:
+          type: string
+        title:
+          type: string
+        body:
+          type: string
+        metadata:
+          type: object
+    TemplateCreate:
+      type: object
+      required:
+        - name
+        - type
+        - title_template
+        - body_template
+        - language
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+        title_template:
+          type: string
+        body_template:
+          type: string
+        variables:
+          type: array
+          items:
+            type: string
+        language:
+          type: string
+          example: "hi"
+        channels:
+          type: array
+          items:
+            type: string
+    TemplateOut:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        type:
+          type: string
+        title_template:
+          type: string
+        body_template:
+          type: string
+        variables:
+          type: array
+          items:
+            type: string
+        language:
+          type: string
+        channels:
+          type: array
+          items:
+            type: string
+        created_at:
+          type: string
+          format: date-time
+    TemplateUpdate:
+      type: object
+      properties:
+        title_template:
+          type: string
+        body_template:
+          type: string
+        variables:
+          type: array
+          items:
+            type: string
+        channels:
+          type: array
+          items:
+            type: string
+
+    # AI Chat Schemas
+    ChatRequest:
+      type: object
+      required:
+        - message
+        - language
+      properties:
+        conversation_id:
+          type: string
+          nullable: true
+        citizen_id:
+          type: string
+          nullable: true
+        message:
+          type: string
+          minLength: 1
+          maxLength: 2000
+        language:
+          type: string
+          example: "hi"
+        dialect:
+          type: string
+          nullable: true
+    ChatResponse:
+      type: object
+      properties:
+        response:
+          type: string
+        conversation_id:
+          type: string
+        suggested_replies:
+          type: array
+          items:
+            type: string
+        schemes:
+          type: array
+          items:
+            type: object
+          nullable: true
+        intent:
+          type: string
+    ConversationOut:
+      type: object
+      properties:
+        id:
+          type: string
+        citizen_id:
+          type: string
+        language:
+          type: string
+        dialect:
+          type: string
+          nullable: true
+        summary:
+          type: string
+          nullable: true
+        message_count:
+          type: integer
+        started_at:
+          type: string
+          format: date-time
+        ended_at:
+          type: string
+          format: date-time
+          nullable: true
+    ConversationListOut:
+      type: object
+      properties:
+        conversations:
+          type: array
+          items:
+            $ref: "#/components/schemas/ConversationOut"
+        total:
+          type: integer
+        page:
+          type: integer
+        page_size:
+          type: integer
+
+    # Voice Schemas
+    VoiceStartRequest:
+      type: object
+      required:
+        - citizen_id
+        - language
+      properties:
+        citizen_id:
+          type: string
+        language:
+          type: string
+        dialect:
+          type: string
+    VoiceStartResponse:
+      type: object
+      properties:
+        session_id:
+          type: string
+        expires_in:
+          type: integer
+          example: 300
+    VoiceChunkRequest:
+      type: object
+      required:
+        - session_id
+        - audio_base64
+      properties:
+        session_id:
+          type: string
+        audio_base64:
+          type: string
+        encoding:
+          type: string
+          default: "LINEAR16"
+        sample_rate:
+          type: integer
+          default: 16000
+    VoiceChunkResponse:
+      type: object
+      properties:
+        transcript:
+          type: string
+        audio_response_base64:
+          type: string
+          nullable: true
+        is_final:
+          type: boolean
+        suggested_actions:
+          type: array
+          items:
+            type: string
+    VoiceEndResponse:
+      type: object
+      properties:
+        session_id:
+          type: string
+        duration:
+          type: integer
+        message_count:
+          type: integer
+        summary:
+          type: string
+
+    # Translate Schemas
+    TranslateRequest:
+      type: object
+      required:
+        - text
+        - target_language
+      properties:
+        text:
+          type: string
+        target_language:
+          type: string
+          example: "hi"
+        source_language:
+          type: string
+          nullable: true
+    TranslateResponse:
+      type: object
+      properties:
+        translated_text:
+          type: string
+        source_language:
+          type: string
+        target_language:
+          type: string
+        confidence:
+          type: number
+          format: float
+    DetectRequest:
+      type: object
+      required:
+        - text
+      properties:
+        text:
+          type: string
+    DetectResponse:
+      type: object
+      properties:
+        language:
+          type: string
+        confidence:
+          type: number
+        dialect:
+          type: string
+          nullable: true
+
+    # Analytics Schemas
+    OverviewKPIs:
+      type: object
+      properties:
+        total_citizens:
+          type: integer
+        total_applications:
+          type: integer
+        total_schemes:
+          type: integer
+        total_grievances:
+          type: integer
+        approval_rate:
+          type: number
+          format: float
+        avg_processing_time:
+          type: number
+          format: float
+        active_users_today:
+          type: integer
+        ai_interactions_total:
+          type: integer
+    RealtimeMetrics:
+      type: object
+      properties:
+        active_sessions:
+          type: integer
+        applications_today:
+          type: integer
+        grievances_today:
+          type: integer
+        ai_queries_today:
+          type: integer
+        documents_uploaded_today:
+          type: integer
+        api_requests_per_minute:
+          type: integer
+    TrendDataPoint:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        metric:
+          type: string
+        value:
+          type: number
+    SchemeAnalytics:
+      type: object
+      properties:
+        scheme_id:
+          type: string
+        scheme_name:
+          type: string
+        category:
+          type: string
+        total_applications:
+          type: integer
+        approval_rate:
+          type: number
+        avg_processing_time_days:
+          type: number
+        benefits_disbursed:
+          type: number
+    SchemeDeepAnalytics:
+      type: object
+      properties:
+        scheme_id:
+          type: string
+        scheme_name:
+          type: string
+        monthly_applications:
+          type: array
+          items:
+            type: object
+        demographic_breakdown:
+          type: object
+        rejection_reasons:
+          type: array
+          items:
+            type: object
+        processing_time_distribution:
+          type: object
+    GeoBreakdown:
+      type: object
+      properties:
+        location:
+          type: string
+        total_citizens:
+          type: integer
+        total_applications:
+          type: integer
+        total_schemes:
+          type: integer
+        approval_rate:
+          type: number
+    GeoHeatmapPoint:
+      type: object
+      properties:
+        latitude:
+          type: number
+        longitude:
+          type: number
+        intensity:
+          type: number
+        label:
+          type: string
+    AIMetrics:
+      type: object
+      properties:
+        total_conversations:
+          type: integer
+        total_messages:
+          type: integer
+        avg_session_duration_seconds:
+          type: number
+        intent_distribution:
+          type: object
+        language_distribution:
+          type: object
+        user_satisfaction_score:
+          type: number
+    LanguageStats:
+      type: object
+      properties:
+        language:
+          type: string
+        conversation_count:
+          type: integer
+        message_count:
+          type: integer
+        percentage:
+          type: number
+    ExportRequest:
+      type: object
+      required:
+        - format
+        - sections
+      properties:
+        format:
+          type: string
+          enum: [csv, json, xlsx]
+        sections:
+          type: array
+          items:
+            type: string
+            enum: [overview, schemes, geo, ai]
+        date_from:
+          type: string
+          format: date
+          nullable: true
+        date_to:
+          type: string
+          format: date
+          nullable: true
+    ExportResponse:
+      type: object
+      properties:
+        export_id:
+          type: string
+        status:
+          type: string
+          enum: [processing, completed, failed]
+        format:
+          type: string
+        download_url:
+          type: string
+          nullable: true
+        expires_at:
+          type: string
+        created_at:
+          type: string
+    ExportStatus:
+      type: object
+      properties:
+        export_id:
+          type: string
+        status:
+          type: string
+        progress:
+          type: integer
+        download_url:
+          type: string
+          nullable: true
+        expires_at:
+          type: string
+        error:
+          type: string
+          nullable: true
+
+tags:
+  - name: Authentication
+    description: OTP-based authentication endpoints
+  - name: Admin Auth
+    description: Admin user management endpoints
+  - name: Citizens
+    description: Citizen profile management
+  - name: Schemes
+    description: Government scheme catalog and management
+  - name: Eligibility
+    description: Eligibility checking engine
+  - name: Applications
+    description: Scheme application management
+  - name: Documents
+    description: Document upload and management
+  - name: Citizen Documents
+    description: Citizen-specific document operations
+  - name: OCR Processing
+    description: OCR document processing endpoints
+  - name: Grievances
+    description: Grievance filing and tracking
+  - name: Notifications
+    description: Notification management
+  - name: Notification Templates
+    description: Notification template management
+  - name: AI Chat
+    description: AI-powered multilingual chat assistant
+  - name: AI Voice
+    description: Voice-based AI interaction
+  - name: AI Translation
+    description: Language translation services
+  - name: AI OCR
+    description: AI-powered document OCR analysis
+  - name: Analytics Overview
+    description: Dashboard KPIs and metrics
+  - name: Scheme Analytics
+    description: Scheme-level analytics
+  - name: Geographic Analytics
+    description: Location-based analytics
+  - name: AI Analytics
+    description: AI performance and language metrics
+  - name: Analytics Export
+    description: Data export functionality
+
+paths:
+  # ===== Health =====
+  /health:
+    get:
+      tags:
+        - Authentication
+      summary: Health check endpoint
+      description: Returns service health status
+      operationId: healthCheck
+      responses:
+        "200":
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "healthy"
+                  service:
+                    type: string
+                  version:
+                    type: string
+
+  # ===== Auth Service =====
+  /auth/otp/send:
+    post:
+      tags:
+        - Authentication
+      summary: Send OTP for login
+      description: Generates and sends a one-time password to the citizen's mobile number via SMS/WhatsApp
+      operationId: sendOtp
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OTPSendRequest"
+            example:
+              mobile_number: "+919876543210"
+      responses:
+        "200":
+          description: OTP sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OTPSendResponse"
+              example:
+                success: true
+                message: "OTP sent successfully"
+                expires_in: 300
+                debug_otp: "123456"
+        "429":
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/otp/verify:
+    post:
+      tags:
+        - Authentication
+      summary: Verify OTP and authenticate
+      description: Verifies the OTP and returns JWT tokens for authenticated session
+      operationId: verifyOtp
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OTPVerifyRequest"
+            example:
+              mobile_number: "+919876543210"
+              otp: "123456"
+      responses:
+        "200":
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OTPVerifyResponse"
+              example:
+                access_token: "eyJhbGciOiJSUzI1NiIs..."
+                refresh_token: "eyJhbGciOiJSUzI1NiIs..."
+                token_type: "bearer"
+                expires_in: 900
+                user:
+                  id: "550e8400-e29b-41d4-a716-446655440000"
+                  mobile_number: "+919876543210"
+                  name: null
+                  role: "citizen"
+                  is_verified: true
+                  preferred_language: "hi"
+                  created_at: "2026-07-04T10:00:00Z"
+        "400":
+          description: Invalid OTP
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh access token
+      description: Uses a valid refresh token to issue a new access token
+      operationId: refreshToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TokenRefreshRequest"
+            example:
+              refresh_token: "eyJhbGciOiJSUzI1NiIs..."
+      responses:
+        "200":
+          description: Token refreshed successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenRefreshResponse"
+              example:
+                access_token: "eyJhbGciOiJSUzI1NiIs..."
+                expires_in: 900
+        "401":
+          description: Invalid or expired refresh token
+
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: Logout and revoke session
+      description: Revokes the refresh token, terminating the session
+      operationId: logout
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LogoutRequest"
+            example:
+              refresh_token: "eyJhbGciOiJSUzI1NiIs..."
+      responses:
+        "204":
+          description: Logout successful, session revoked
+
+  /auth/me:
+    get:
+      tags:
+        - Authentication
+      summary: Get current user profile
+      description: Returns the authenticated user's profile information
+      operationId: getCurrentUser
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Current user profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserOut"
+              example:
+                id: "550e8400-e29b-41d4-a716-446655440000"
+                mobile_number: "+919876543210"
+                name: "Ramesh Kumar"
+                role: "citizen"
+                is_verified: true
+                preferred_language: "hi"
+                created_at: "2026-07-04T10:00:00Z"
+
+  # ===== Admin Auth =====
+  /admin/users:
+    get:
+      tags:
+        - Admin Auth
+      summary: List all users (admin)
+      description: Returns paginated list of users with optional filters
+      operationId: listUsers
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: is_active
+          in: query
+          schema:
+            type: boolean
+        - name: is_verified
+          in: query
+          schema:
+            type: boolean
+        - name: role
+          in: query
+          schema:
+            type: string
+            enum: [citizen, admin, super_admin]
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Search by name or mobile number
+      responses:
+        "200":
+          description: Paginated list of users
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedUsers"
+
+  /admin/users/{user_id}:
+    get:
+      tags:
+        - Admin Auth
+      summary: Get user by ID
+      operationId: getUser
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: User details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserOut"
+    put:
+      tags:
+        - Admin Auth
+      summary: Update user
+      operationId: updateUser
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserUpdate"
+      responses:
+        "200":
+          description: User updated
+    delete:
+      tags:
+        - Admin Auth
+      summary: Deactivate user
+      operationId: deleteUser
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: User deactivated
+
+  /admin/users/{user_id}/verify:
+    post:
+      tags:
+        - Admin Auth
+      summary: Verify user identity
+      operationId: verifyUser
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: User verified
+
+  # ===== Citizen Service =====
+  /citizens/search:
+    get:
+      tags:
+        - Citizens
+      summary: Search citizens (admin)
+      operationId: searchCitizens
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: q
+          in: query
+          schema:
+            type: string
+          description: Search by name, mobile, or Aadhaar hash
+        - name: state
+          in: query
+          schema:
+            type: string
+        - name: district
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Search results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/CitizenOut"
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  page_size:
+                    type: integer
+                  total_pages:
+                    type: integer
+
+  /citizens/{citizen_id}:
+    get:
+      tags:
+        - Citizens
+      summary: Get citizen profile
+      operationId: getCitizen
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: citizen_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Citizen profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CitizenOut"
+    put:
+      tags:
+        - Citizens
+      summary: Update citizen profile
+      operationId: updateCitizen
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: citizen_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CitizenUpdate"
+      responses:
+        "200":
+          description: Profile updated
+
+  /citizens/{citizen_id}/summary:
+    get:
+      tags:
+        - Citizens
+      summary: Get citizen summary with counts
+      operationId: getCitizenSummary
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: citizen_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Citizen summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CitizenSummary"
+
+  /citizens/{citizen_id}/family:
+    get:
+      tags:
+        - Citizens
+      summary: List family members
+      operationId: listFamilyMembers
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: citizen_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: List of family members
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FamilyMemberOut"
+    post:
+      tags:
+        - Citizens
+      summary: Add family member
+      operationId: addFamilyMember
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: citizen_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FamilyMemberCreate"
+      responses:
+        "201":
+          description: Family member added
+
+  /citizens/{citizen_id}/family/{member_id}:
+    delete:
+      tags:
+        - Citizens
+      summary: Remove family member
+      operationId: removeFamilyMember
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: citizen_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: member_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Family member removed
+
+  # ===== Scheme Service =====
+  /schemes:
+    get:
+      tags:
+        - Schemes
+      summary: List schemes
+      operationId: listSchemes
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: state
+          in: query
+          schema:
+            type: string
+        - name: ministry
+          in: query
+          schema:
+            type: string
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: Paginated list of schemes
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/SchemeOut"
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  page_size:
+                    type: integer
+                  total_pages:
+                    type: integer
+    post:
+      tags:
+        - Schemes
+      summary: Create scheme (admin)
+      operationId: createScheme
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SchemeCreate"
+      responses:
+        "201":
+          description: Scheme created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SchemeOut"
+
+  /schemes/categories:
+    get:
+      tags:
+        - Schemes
+      summary: List scheme categories with counts
+      operationId: listCategories
+      responses:
+        "200":
+          description: Categories with counts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CategoryOut"
+
+  /schemes/match:
+    get:
+      tags:
+        - Schemes
+      summary: Match schemes for citizen
+      operationId: matchSchemes
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: citizen_id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: Matched schemes with scores
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SchemeMatch"
+
+  /schemes/eligibility:
+    post:
+      tags:
+        - Schemes
+      summary: Check eligibility for a scheme
+      operationId: checkEligibility
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EligibilityCheckRequest"
+      responses:
+        "200":
+          description: Eligibility check result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EligibilityCheckResult"
+
+  /schemes/{scheme_id}:
+    get:
+      tags:
+        - Schemes
+      summary: Get scheme details
+      operationId: getScheme
+      parameters:
+        - name: scheme_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Scheme details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SchemeOut"
+    put:
+      tags:
+        - Schemes
+      summary: Update scheme (admin)
+      operationId: updateScheme
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: scheme_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SchemeUpdate"
+      responses:
+        "200":
+          description: Scheme updated
+    delete:
+      tags:
+        - Schemes
+      summary: Delete scheme (admin)
+      operationId: deleteScheme
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: scheme_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Scheme deleted
+
+  # ===== Eligibility Router =====
+  /eligibility/check:
+    post:
+      tags:
+        - Eligibility
+      summary: Check eligibility for a specific scheme
+      operationId: eligibilityCheck
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EligibilityRequest"
+      responses:
+        "200":
+          description: Eligibility result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EligibilityResponse"
+
+  /eligibility/batch:
+    post:
+      tags:
+        - Eligibility
+      summary: Batch check eligibility for multiple schemes
+      operationId: batchEligibilityCheck
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BatchEligibilityRequest"
+      responses:
+        "200":
+          description: Batch eligibility results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BatchEligibilityResponse"
+
+  /eligibility/criteria/{scheme_id}:
+    get:
+      tags:
+        - Eligibility
+      summary: Get eligibility criteria explanation for a scheme
+      operationId: getCriteriaExplanation
+      parameters:
+        - name: scheme_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: language
+          in: query
+          schema:
+            type: string
+            default: "en"
+      responses:
+        "200":
+          description: Criteria explanation
+          content:
+            application/json:
+              schema:
+                type: object
+
+  # ===== Applications =====
+  /applications:
+    post:
+      tags:
+        - Applications
+      summary: Create a new application
+      operationId: createApplication
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApplicationCreate"
+      responses:
+        "201":
+          description: Application created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApplicationOut"
+
+  /applications/pending:
+    get:
+      tags:
+        - Applications
+      summary: List pending applications (gov officer)
+      operationId: listPendingApplications
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Pending applications
+
+  /applications/bulk-approve:
+    post:
+      tags:
+        - Applications
+      summary: Bulk approve applications (admin)
+      operationId: bulkApproveApplications
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BulkApproveRequest"
+      responses:
+        "200":
+          description: Bulk approval result
+
+  /applications/{application_id}:
+    get:
+      tags:
+        - Applications
+      summary: Get application details
+      operationId: getApplication
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: application_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Application details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApplicationOut"
+    put:
+      tags:
+        - Applications
+      summary: Update draft application
+      operationId: updateApplication
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: application_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApplicationUpdate"
+      responses:
+        "200":
+          description: Application updated
+
+  /applications/{application_id}/submit:
+    post:
+      tags:
+        - Applications
+      summary: Submit application for review
+      operationId: submitApplication
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: application_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Application submitted
+
+  /applications/{application_id}/review:
+    post:
+      tags:
+        - Applications
+      summary: Review application (gov officer)
+      operationId: reviewApplication
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: application_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApplicationReview"
+      responses:
+        "200":
+          description: Application moved to under review
+
+  /applications/{application_id}/approve:
+    post:
+      tags:
+        - Applications
+      summary: Approve application (gov officer)
+      operationId: approveApplication
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: application_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApplicationApprove"
+      responses:
+        "200":
+          description: Application approved
+
+  /applications/{application_id}/reject:
+    post:
+      tags:
+        - Applications
+      summary: Reject application (gov officer)
+      operationId: rejectApplication
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: application_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApplicationReject"
+      responses:
+        "200":
+          description: Application rejected
+
+  /citizens/{citizen_id}/applications:
+    get:
+      tags:
+        - Applications
+      summary: List citizen's applications
+      operationId: listCitizenApplications
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: citizen_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: List of applications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ApplicationOut"
+
+  # ===== Document Service =====
+  /documents/upload:
+    post:
+      tags:
+        - Documents
+      summary: Upload a document with optional OCR
+      operationId: uploadDocument
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - citizen_id
+                - document_type
+                - file
+              properties:
+                citizen_id:
+                  type: string
+                  format: uuid
+                document_type:
+                  type: string
+                  enum: [aadhaar, income_certificate, land_record, bank_passbook, photo, signature, other]
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "201":
+          description: Document uploaded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DocumentUploadResponse"
+
+  /documents/{document_id}:
+    get:
+      tags:
+        - Documents
+      summary: Get document metadata
+      operationId: getDocument
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: document_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Document metadata
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DocumentOut"
+    delete:
+      tags:
+        - Documents
+      summary: Soft delete a document
+      operationId: deleteDocument
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: document_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Document deleted
+
+  /documents/{document_id}/download:
+    get:
+      tags:
+        - Documents
+      summary: Get document download URL
+      operationId: downloadDocument
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: document_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Presigned download URL
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  download_url:
+                    type: string
+                  expires_in:
+                    type: integer
+
+  /documents/{document_id}/verify:
+    post:
+      tags:
+        - Documents
+      summary: Verify a document (admin)
+      operationId: verifyDocument
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: document_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DocumentVerifyRequest"
+      responses:
+        "200":
+          description: Document verification status updated
+
+  /documents/{document_id}/reprocess:
+    post:
+      tags:
+        - Documents
+      summary: Reprocess OCR for a document
+      operationId: reprocessDocument
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: document_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Document reprocessed
+
+  /documents/{document_id}/extract:
+    get:
+      tags:
+        - Documents
+      summary: Get OCR extracted data
+      operationId: getOcrExtract
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: document_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: OCR extracted fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OCRResult"
+
+  /documents/autofill:
+    post:
+      tags:
+        - Documents
+      summary: Auto-fill form fields from verified documents
+      operationId: autofillForm
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AutoFillRequest"
+      responses:
+        "200":
+          description: Auto-filled form data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AutoFillResponse"
+
+  /citizens/{citizen_id}/documents:
+    get:
+      tags:
+        - Citizen Documents
+      summary: List citizen's documents
+      operationId: listCitizenDocuments
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: citizen_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: document_type
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of documents
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DocumentList"
+
+  /ocr/process:
+    post:
+      tags:
+        - OCR Processing
+      summary: Process document OCR with upload
+      operationId: ocrProcess
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - citizen_id
+                - document_type
+                - file
+              properties:
+                citizen_id:
+                  type: string
+                  format: uuid
+                document_type:
+                  type: string
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: OCR processed and document stored
+
+  /ocr/aadhaar:
+    post:
+      tags:
+        - OCR Processing
+      summary: OCR specialized for Aadhaar cards
+      operationId: ocrAadhaar
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - citizen_id
+                - file
+              properties:
+                citizen_id:
+                  type: string
+                  format: uuid
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: Aadhaar OCR result
+
+  /ocr/income:
+    post:
+      tags:
+        - OCR Processing
+      summary: OCR specialized for income certificates
+      operationId: ocrIncome
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - citizen_id
+                - file
+              properties:
+                citizen_id:
+                  type: string
+                  format: uuid
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: Income certificate OCR result
+
+  /ocr/land-record:
+    post:
+      tags:
+        - OCR Processing
+      summary: OCR specialized for land records
+      operationId: ocrLandRecord
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - citizen_id
+                - file
+              properties:
+                citizen_id:
+                  type: string
+                  format: uuid
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: Land record OCR result
+
+  /ocr/bank-passbook:
+    post:
+      tags:
+        - OCR Processing
+      summary: OCR specialized for bank passbooks
+      operationId: ocrBankPassbook
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - citizen_id
+                - file
+              properties:
+                citizen_id:
+                  type: string
+                  format: uuid
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: Bank passbook OCR result
+
+  # ===== Grievance Service =====
+  /grievances:
+    post:
+      tags:
+        - Grievances
+      summary: Create a new grievance
+      operationId: createGrievance
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GrievanceCreate"
+            example:
+              citizen_id: "550e8400-e29b-41d4-a716-446655440000"
+              category: "scheme_related"
+              department: "Department of Social Welfare"
+              subject: "PM Awas Yojana application pending for 6 months"
+              description: "I applied for PM Awas Yojana in January but have not received any update."
+              original_language: "hi"
+              priority: "high"
+      responses:
+        "201":
+          description: Grievance created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GrievanceOut"
+
+  /grievances/pending:
+    get:
+      tags:
+        - Grievances
+      summary: List pending grievances (gov officer)
+      operationId: listPendingGrievances
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: priority
+          in: query
+          schema:
+            type: string
+            enum: [low, medium, high, critical]
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Pending grievances list
+
+  /grievances/{grievance_id}:
+    get:
+      tags:
+        - Grievances
+      summary: Get grievance details
+      operationId: getGrievance
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: grievance_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Grievance details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GrievanceOut"
+    put:
+      tags:
+        - Grievances
+      summary: Update grievance
+      operationId: updateGrievance
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: grievance_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GrievanceUpdate"
+      responses:
+        "200":
+          description: Grievance updated
+
+  /grievances/{grievance_id}/submit:
+    post:
+      tags:
+        - Grievances
+      summary: Submit grievance for processing
+      operationId: submitGrievance
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: grievance_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Grievance submitted
+
+  /grievances/{grievance_id}/escalate:
+    post:
+      tags:
+        - Grievances
+      summary: Escalate grievance (gov officer)
+      operationId: escalateGrievance
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: grievance_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Grievance escalated
+
+  /grievances/{grievance_id}/resolve:
+    post:
+      tags:
+        - Grievances
+      summary: Resolve grievance (gov officer)
+      operationId: resolveGrievance
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: grievance_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - resolution_notes
+              properties:
+                resolution_notes:
+                  type: string
+      responses:
+        "200":
+          description: Grievance resolved
+
+  /grievances/{grievance_id}/reopen:
+    post:
+      tags:
+        - Grievances
+      summary: Reopen resolved grievance
+      operationId: reopenGrievance
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: grievance_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Grievance reopened
+
+  /grievances/{grievance_id}/tracking:
+    get:
+      tags:
+        - Grievances
+      summary: Get grievance tracking history
+      operationId: getGrievanceTracking
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: grievance_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Tracking history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ComplaintTrackingOut"
+
+  /citizens/{citizen_id}/grievances:
+    get:
+      tags:
+        - Grievances
+      summary: List citizen's grievances
+      operationId: listCitizenGrievances
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: citizen_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Citizen's grievances
+
+  /ai/grievances/draft:
+    post:
+      tags:
+        - Grievances
+      summary: AI-assisted grievance drafting
+      operationId: aiDraftGrievance
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GrievanceDraftRequest"
+      responses:
+        "200":
+          description: AI-drafted grievance
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GrievanceDraftResponse"
+
+  # ===== Notification Service =====
+  /notifications:
+    get:
+      tags:
+        - Notifications
+      summary: Get user notifications
+      operationId: getNotifications
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: is_read
+          in: query
+          schema:
+            type: boolean
+        - name: type
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Paginated notifications with unread count
+
+  /notifications/send:
+    post:
+      tags:
+        - Notifications
+      summary: Send notification to citizen (admin)
+      operationId: sendNotification
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NotificationSendRequest"
+      responses:
+        "201":
+          description: Notification sent
+
+  /notifications/send-bulk:
+    post:
+      tags:
+        - Notifications
+      summary: Send bulk notification (admin)
+      operationId: sendBulkNotifications
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BulkSendRequest"
+      responses:
+        "201":
+          description: Bulk notification sent
+
+  /notifications/{notification_id}/read:
+    put:
+      tags:
+        - Notifications
+      summary: Mark notification as read
+      operationId: markAsRead
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: notification_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Notification marked as read
+
+  /notifications/read-all:
+    put:
+      tags:
+        - Notifications
+      summary: Mark all notifications as read
+      operationId: markAllAsRead
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: All notifications marked as read
+
+  /notifications/preferences:
+    get:
+      tags:
+        - Notifications
+      summary: Get notification preferences
+      operationId: getPreferences
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Notification preferences
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationPreferenceOut"
+    put:
+      tags:
+        - Notifications
+      summary: Update notification preferences
+      operationId: updatePreferences
+      security:
+        - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NotificationPreferenceUpdate"
+      responses:
+        "200":
+          description: Preferences updated
+
+  /notifications/{notification_id}:
+    delete:
+      tags:
+        - Notifications
+      summary: Delete a notification
+      operationId: deleteNotification
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: notification_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Notification deleted
+
+  /templates:
+    get:
+      tags:
+        - Notification Templates
+      summary: List notification templates (admin)
+      operationId: listTemplates
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: type
+          in: query
+          schema:
+            type: string
+        - name: language
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of templates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TemplateOut"
+    post:
+      tags:
+        - Notification Templates
+      summary: Create notification template (admin)
+      operationId: createTemplate
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TemplateCreate"
+      responses:
+        "201":
+          description: Template created
+
+  /templates/{template_id}:
+    get:
+      tags:
+        - Notification Templates
+      summary: Get template by ID
+      operationId: getTemplate
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: template_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Template details
+    put:
+      tags:
+        - Notification Templates
+      summary: Update template (admin)
+      operationId: updateTemplate
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: template_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TemplateUpdate"
+      responses:
+        "200":
+          description: Template updated
+    delete:
+      tags:
+        - Notification Templates
+      summary: Delete template (admin)
+      operationId: deleteTemplate
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: template_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Template deleted
+
+  # ===== AI Service =====
+  /ai/chat:
+    post:
+      tags:
+        - AI Chat
+      summary: Send a message to AI assistant
+      description: Process a citizen's message through the AI chatbot, detecting intent and generating contextual responses in the citizen's language
+      operationId: aiChat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatRequest"
+            example:
+              conversation_id: null
+              citizen_id: "550e8400-e29b-41d4-a716-446655440000"
+              message: "Mujhe PM Awas Yojana ke baare mein batao"
+              language: "hi"
+              dialect: null
+      responses:
+        "200":
+          description: AI response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatResponse"
+              example:
+                response: "PM Awas Yojana ek pradhanmantri aawas yojana hai jo gareeb parivaron ko pucca ghar pradan karti hai..."
+                conversation_id: "conv-a1b2c3d4"
+                suggested_replies:
+                  - "Kya main iske liye patra hoon?"
+                  - "Aavedan kaise karein?"
+                  - "Aur kya yojanaen hain?"
+                schemes:
+                  - scheme:
+                      id: "scheme-uuid"
+                      name: "Pradhan Mantri Awas Yojana"
+                      name_hindi: "प्रधानमंत्री आवास योजना"
+                    match_score: 0.92
+                    explanation: "You match the income criteria and rural area requirement"
+                intent: "scheme_discovery"
+
+  /ai/voice/start:
+    post:
+      tags:
+        - AI Voice
+      summary: Start a voice session
+      operationId: startVoiceSession
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VoiceStartRequest"
+      responses:
+        "200":
+          description: Voice session started
+
+  /ai/voice/chunk:
+    post:
+      tags:
+        - AI Voice
+      summary: Process voice audio chunk
+      operationId: processVoiceChunk
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VoiceChunkRequest"
+      responses:
+        "200":
+          description: Voice chunk processed
+
+  /ai/voice/end/{session_id}:
+    post:
+      tags:
+        - AI Voice
+      summary: End a voice session
+      operationId: endVoiceSession
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Voice session ended
+
+  /ai/conversations:
+    get:
+      tags:
+        - AI Chat
+      summary: List AI conversations for a citizen
+      operationId: listConversations
+      parameters:
+        - name: citizen_id
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of conversations
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConversationListOut"
+
+  /ai/conversations/{conversation_id}:
+    get:
+      tags:
+        - AI Chat
+      summary: Get conversation details
+      operationId: getConversation
+      parameters:
+        - name: conversation_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Conversation details
+    delete:
+      tags:
+        - AI Chat
+      summary: Delete a conversation
+      operationId: deleteConversation
+      parameters:
+        - name: conversation_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Conversation deleted
+
+  /ai/translate:
+    post:
+      tags:
+        - AI Translation
+      summary: Translate text between languages
+      operationId: translateText
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TranslateRequest"
+      responses:
+        "200":
+          description: Translated text
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TranslateResponse"
+
+  /ai/translate/detect:
+    post:
+      tags:
+        - AI Translation
+      summary: Detect language of text
+      operationId: detectLanguage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DetectRequest"
+      responses:
+        "200":
+          description: Detected language
+
+  /ai/ocr/process:
+    post:
+      tags:
+        - AI OCR
+      summary: Process document OCR with AI
+      description: Uses AI vision to extract fields from scanned document images
+      operationId: aiOcrProcess
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OCRProcessRequest"
+      responses:
+        "200":
+          description: OCR extraction result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OCRProcessResponse"
+
+  /ai/ocr/analyze:
+    post:
+      tags:
+        - AI OCR
+      summary: Analyze OCR data for validation
+      operationId: aiOcrAnalyze
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OCRAnalyzeRequest"
+      responses:
+        "200":
+          description: OCR analysis result
+
+  # ===== Analytics Service =====
+  /analytics/overview:
+    get:
+      tags:
+        - Analytics Overview
+      summary: Get overview KPIs
+      operationId: getOverviewKpis
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Overview metrics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OverviewKPIs"
+
+  /analytics/realtime:
+    get:
+      tags:
+        - Analytics Overview
+      summary: Get realtime metrics
+      operationId: getRealtimeMetrics
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Realtime metrics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RealtimeMetrics"
+
+  /analytics/trends:
+    get:
+      tags:
+        - Analytics Overview
+      summary: Get trend data
+      operationId: getTrendData
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [7d, 30d, 90d, 1y]
+            default: 30d
+      responses:
+        "200":
+          description: Trend points
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TrendDataPoint"
+
+  /analytics/schemes:
+    get:
+      tags:
+        - Scheme Analytics
+      summary: Get scheme-level analytics
+      operationId: getSchemeAnalytics
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: sort_by
+          in: query
+          schema:
+            type: string
+            enum: [total_applications, approval_rate, avg_processing_time_days, benefits_disbursed]
+            default: total_applications
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: Scheme analytics
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SchemeAnalytics"
+
+  /analytics/schemes/{scheme_id}:
+    get:
+      tags:
+        - Scheme Analytics
+      summary: Get deep scheme analytics
+      operationId: getSchemeDeepAnalytics
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: scheme_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Deep scheme analytics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SchemeDeepAnalytics"
+
+  /analytics/geo:
+    get:
+      tags:
+        - Geographic Analytics
+      summary: Get geographic breakdown
+      operationId: getGeoBreakdown
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: level
+          in: query
+          schema:
+            type: string
+            enum: [state, district]
+            default: district
+        - name: state
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Geographic breakdown
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GeoBreakdown"
+
+  /analytics/geo/heatmap:
+    get:
+      tags:
+        - Geographic Analytics
+      summary: Get geographic heatmap data
+      operationId: getGeoHeatmap
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: state
+          in: query
+          schema:
+            type: string
+        - name: district
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Heatmap points
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GeoHeatmapPoint"
+
+  /analytics/ai-performance:
+    get:
+      tags:
+        - AI Analytics
+      summary: Get AI performance metrics
+      operationId: getAiPerformanceMetrics
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: AI performance metrics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AIMetrics"
+
+  /analytics/ai/languages:
+    get:
+      tags:
+        - AI Analytics
+      summary: Get AI language usage stats
+      operationId: getLanguageStats
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Language statistics
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LanguageStats"
+
+  /analytics/export:
+    post:
+      tags:
+        - Analytics Export
+      summary: Create analytics export job
+      operationId: createExport
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExportRequest"
+      responses:
+        "200":
+          description: Export job created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExportResponse"
+
+  /analytics/exports/{export_id}:
+    get:
+      tags:
+        - Analytics Export
+      summary: Get export job status
+      operationId: getExportStatus
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: export_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Export status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExportStatus"
+
+  /analytics/exports/{export_id}/download:
+    get:
+      tags:
+        - Analytics Export
+      summary: Download completed export
+      operationId: downloadExport
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: export_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Download URL

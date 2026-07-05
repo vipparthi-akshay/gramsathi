@@ -1,0 +1,2318 @@
+{
+  "info": {
+    "name": "GramSathi AI API",
+    "description": "API collection for GramSathi AI - AI-Powered Multilingual Government Assistant for Rural Citizens\n\nBase URL: {{base_url}}\nAuthentication: {{auth_token}}",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "gramsathi"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8001/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "auth_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refresh_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "citizen_id",
+      "value": "550e8400-e29b-41d4-a716-446655440000",
+      "type": "string"
+    },
+    {
+      "key": "scheme_id",
+      "value": "660e8400-e29b-41d4-a716-446655440001",
+      "type": "string"
+    },
+    {
+      "key": "application_id",
+      "value": "770e8400-e29b-41d4-a716-446655440002",
+      "type": "string"
+    },
+    {
+      "key": "document_id",
+      "value": "880e8400-e29b-41d4-a716-446655440003",
+      "type": "string"
+    },
+    {
+      "key": "grievance_id",
+      "value": "990e8400-e29b-41d4-a716-446655440004",
+      "type": "string"
+    },
+    {
+      "key": "notification_id",
+      "value": "aa0e8400-e29b-41d4-a716-446655440005",
+      "type": "string"
+    },
+    {
+      "key": "mobile_number",
+      "value": "+919876543210",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{auth_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Auth Service",
+      "description": "OTP-based authentication and admin user management",
+      "item": [
+        {
+          "name": "Send OTP",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function() { pm.response.to.have.status(200); });",
+                  "var json = pm.response.json(); pm.expect(json.success).to.eql(true);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Request-ID",
+                "value": "{{$guid}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mobile_number\": \"{{mobile_number}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/otp/send",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "otp",
+                "send"
+              ]
+            },
+            "description": "Send OTP to mobile number for login"
+          }
+        },
+        {
+          "name": "Verify OTP",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function() { pm.response.to.have.status(200); });",
+                  "var json = pm.response.json();",
+                  "pm.collectionVariables.set('auth_token', json.access_token);",
+                  "pm.collectionVariables.set('refresh_token', json.refresh_token);",
+                  "pm.test('Tokens received', function() { pm.expect(json.access_token).to.not.be.empty; });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mobile_number\": \"{{mobile_number}}\",\n  \"otp\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/otp/verify",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "otp",
+                "verify"
+              ]
+            },
+            "description": "Verify OTP and get JWT tokens"
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/refresh",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "refresh"
+              ]
+            },
+            "description": "Refresh expired access token"
+          }
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            },
+            "description": "Get authenticated user profile"
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/logout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            },
+            "description": "Logout and revoke session"
+          }
+        },
+        {
+          "name": "Admin - List Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/users?page=1&page_size=20",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "page_size",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "Admin: List all users with pagination"
+          }
+        },
+        {
+          "name": "Admin - Get User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/users/{{citizen_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "{{citizen_id}}"
+              ]
+            },
+            "description": "Admin: Get user by ID"
+          }
+        },
+        {
+          "name": "Admin - Update User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ramesh Kumar\",\n  \"preferred_language\": \"hi\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/admin/users/{{citizen_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "{{citizen_id}}"
+              ]
+            },
+            "description": "Admin: Update user details"
+          }
+        },
+        {
+          "name": "Admin - Verify User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/users/{{citizen_id}}/verify",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "{{citizen_id}}",
+                "verify"
+              ]
+            },
+            "description": "Admin: Verify user identity"
+          }
+        },
+        {
+          "name": "Admin - Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/users/{{citizen_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "{{citizen_id}}"
+              ]
+            },
+            "description": "Admin: Deactivate user"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Citizen Service",
+      "description": "Citizen profile management and family members",
+      "item": [
+        {
+          "name": "Get Citizen Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/citizens/{{citizen_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "citizens",
+                "{{citizen_id}}"
+              ]
+            },
+            "description": "Get citizen profile details"
+          }
+        },
+        {
+          "name": "Update Citizen Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ramesh Kumar\",\n  \"date_of_birth\": \"1990-01-15\",\n  \"gender\": \"male\",\n  \"state\": \"Uttar Pradesh\",\n  \"district\": \"Lucknow\",\n  \"caste_category\": \"obc\",\n  \"annual_income\": 120000,\n  \"occupation\": \"Farmer\",\n  \"preferred_language\": \"hi\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/citizens/{{citizen_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "citizens",
+                "{{citizen_id}}"
+              ]
+            },
+            "description": "Update citizen profile"
+          }
+        },
+        {
+          "name": "Get Citizen Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/citizens/{{citizen_id}}/summary",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "citizens",
+                "{{citizen_id}}",
+                "summary"
+              ]
+            },
+            "description": "Get citizen summary with counts"
+          }
+        },
+        {
+          "name": "List Family Members",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/citizens/{{citizen_id}}/family",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "citizens",
+                "{{citizen_id}}",
+                "family"
+              ]
+            },
+            "description": "List family members"
+          }
+        },
+        {
+          "name": "Add Family Member",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sita Devi\",\n  \"relationship\": \"spouse\",\n  \"date_of_birth\": \"1993-06-20\",\n  \"gender\": \"female\",\n  \"occupation\": \"Housewife\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/citizens/{{citizen_id}}/family",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "citizens",
+                "{{citizen_id}}",
+                "family"
+              ]
+            },
+            "description": "Add a family member"
+          }
+        },
+        {
+          "name": "Search Citizens (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/citizens/search?q=Ramesh&state=Uttar%20Pradesh",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "citizens",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "Ramesh"
+                },
+                {
+                  "key": "state",
+                  "value": "Uttar Pradesh"
+                }
+              ]
+            },
+            "description": "Admin: Search citizens"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Scheme Service",
+      "description": "Government scheme catalog and eligibility",
+      "item": [
+        {
+          "name": "List Schemes",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/schemes?page=1&page_size=20",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "schemes?page=1&page_size=20"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "page_size",
+                  "value": "20"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ]
+          },
+          "description": "List all available schemes with filters"
+        },
+        {
+          "name": "Get Scheme",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/schemes/{{scheme_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "schemes",
+                "{{scheme_id}}"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ]
+          },
+          "description": "Get scheme details"
+        },
+        {
+          "name": "List Categories",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/schemes/categories",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "schemes",
+                "categories"
+              ]
+            }
+          },
+          "description": "List categories with counts"
+        },
+        {
+          "name": "Match Schemes",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/schemes/match?citizen_id={{citizen_id}}&limit=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "schemes",
+                "match?citizen_id={{citizen_id}}&limit=10"
+              ],
+              "query": [
+                {
+                  "key": "citizen_id",
+                  "value": "{{citizen_id}}"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ]
+          },
+          "description": "Personalized scheme recommendations"
+        },
+        {
+          "name": "Check Eligibility",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/schemes/eligibility",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "schemes",
+                "eligibility"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"citizen_id\": \"{{citizen_id}}\",\n  \"scheme_id\": \"{{scheme_id}}\"\n}"
+            }
+          },
+          "description": "Check scheme eligibility"
+        },
+        {
+          "name": "Create Scheme (Admin)",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/schemes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "schemes"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"PM Kisan Samman Nidhi\",\n  \"name_hindi\": \"पीएम किसान सम्मान निधि\",\n  \"description\": \"Income support of Rs.6000/year\",\n  \"category\": \"agriculture\",\n  \"ministry\": \"Ministry of Agriculture\",\n  \"benefits\": \"Rs.6000/year\",\n  \"required_documents\": [\n    \"Aadhaar\",\n    \"Land Records\",\n    \"Bank Account\"\n  ],\n  \"tags\": [\n    \"farmer\",\n    \"income-support\",\n    \"central\"\n  ]\n}"
+            }
+          },
+          "description": "Admin: Create scheme"
+        },
+        {
+          "name": "Eligibility Check",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/eligibility/check",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "eligibility",
+                "check"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"citizen_id\": \"{{citizen_id}}\",\n  \"scheme_id\": \"{{scheme_id}}\"\n}"
+            }
+          },
+          "description": "Detailed eligibility check"
+        },
+        {
+          "name": "Batch Eligibility",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/eligibility/batch",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "eligibility",
+                "batch"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"citizen_id\": \"{{citizen_id}}\",\n  \"scheme_ids\": [\n    \"{{scheme_id}}\"\n  ]\n}"
+            }
+          },
+          "description": "Batch eligibility check"
+        },
+        {
+          "name": "Get Criteria",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/eligibility/criteria/{{scheme_id}}?language=hi",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "eligibility",
+                "criteria",
+                "{{scheme_id}}?language=hi"
+              ],
+              "query": [
+                {
+                  "key": "language",
+                  "value": "hi"
+                }
+              ]
+            }
+          },
+          "description": "Get criteria explanation"
+        }
+      ]
+    },
+    {
+      "name": "Application Service",
+      "description": "Scheme application submission and processing",
+      "item": [
+        {
+          "name": "Create Application",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/applications",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "applications"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"citizen_id\": \"{{citizen_id}}\",\n  \"scheme_id\": \"{{scheme_id}}\",\n  \"form_data\": {\n    \"full_name\": \"Ramesh Kumar\",\n    \"state\": \"Uttar Pradesh\",\n    \"district\": \"Lucknow\"\n  },\n  \"documents_submitted\": [\n    \"{{document_id}}\"\n  ]\n}"
+            }
+          },
+          "description": "Create new application"
+        },
+        {
+          "name": "Get Application",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/applications/{{application_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "applications",
+                "{{application_id}}"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ]
+          },
+          "description": "Get application details"
+        },
+        {
+          "name": "Submit Application",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/applications/{{application_id}}/submit",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "applications",
+                "{{application_id}}",
+                "submit"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ]
+          },
+          "description": "Submit draft application"
+        },
+        {
+          "name": "Review Application",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/applications/{{application_id}}/review",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "applications",
+                "{{application_id}}",
+                "review"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ai_summary\": \"Applicant meets all criteria. Documents verified.\"\n}"
+            }
+          },
+          "description": "Officer: Review application"
+        },
+        {
+          "name": "Approve Application",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/applications/{{application_id}}/approve",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "applications",
+                "{{application_id}}",
+                "approve"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"government_ref_id\": \"GOV/2026/UP/12345\"\n}"
+            }
+          },
+          "description": "Officer: Approve application"
+        },
+        {
+          "name": "Reject Application",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/applications/{{application_id}}/reject",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "applications",
+                "{{application_id}}",
+                "reject"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rejection_reason\": \"Income exceeds eligibility limit\"\n}"
+            }
+          },
+          "description": "Officer: Reject application"
+        },
+        {
+          "name": "List Pending",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/applications/pending",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "applications",
+                "pending"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ]
+          },
+          "description": "Officer: Pending applications"
+        },
+        {
+          "name": "List Citizen Apps",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/citizens/{{citizen_id}}/applications",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "citizens",
+                "{{citizen_id}}",
+                "applications"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ]
+          },
+          "description": "List citizen's applications"
+        },
+        {
+          "name": "Bulk Approve",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/applications/bulk-approve",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "applications",
+                "bulk-approve"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"application_ids\": [\n    \"{{application_id}}\"\n  ],\n  \"government_ref_id\": \"GOV/BATCH/001\"\n}"
+            }
+          },
+          "description": "Admin: Bulk approve"
+        }
+      ]
+    },
+    {
+      "name": "Document Service",
+      "description": "Document upload, OCR, and management",
+      "item": [
+        {
+          "name": "Upload Document",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "citizen_id",
+                  "value": "{{citizen_id}}",
+                  "type": "text"
+                },
+                {
+                  "key": "document_type",
+                  "value": "aadhaar",
+                  "type": "text"
+                },
+                {
+                  "key": "file",
+                  "src": "/sample/aadhaar.jpg",
+                  "type": "file"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/documents/upload",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "documents",
+                "upload"
+              ]
+            }
+          },
+          "description": "Upload document with OCR"
+        },
+        {
+          "name": "Get Document",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/documents/{{document_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "documents",
+                "{{document_id}}"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ]
+          },
+          "description": "Get document metadata"
+        },
+        {
+          "name": "Download URL",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/documents/{{document_id}}/download",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "documents",
+                "{{document_id}}",
+                "download"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ]
+          },
+          "description": "Get download URL"
+        },
+        {
+          "name": "Verify Document",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/documents/{{document_id}}/verify",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "documents",
+                "{{document_id}}",
+                "verify"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"verified\",\n  \"verified_by\": \"admin-uuid\"\n}"
+            }
+          },
+          "description": "Admin: Verify document"
+        },
+        {
+          "name": "Reprocess OCR",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/documents/{{document_id}}/reprocess",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "documents",
+                "{{document_id}}",
+                "reprocess"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ]
+          },
+          "description": "Reprocess OCR"
+        },
+        {
+          "name": "Get OCR Extract",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/documents/{{document_id}}/extract",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "documents",
+                "{{document_id}}",
+                "extract"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ]
+          },
+          "description": "Get OCR fields"
+        },
+        {
+          "name": "Autofill Form",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/documents/autofill",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "documents",
+                "autofill"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"citizen_id\": \"{{citizen_id}}\",\n  \"form_fields\": [\n    \"full_name\",\n    \"date_of_birth\",\n    \"gender\"\n  ]\n}"
+            }
+          },
+          "description": "Auto-fill from documents"
+        },
+        {
+          "name": "List Citizen Docs",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/citizens/{{citizen_id}}/documents",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "citizens",
+                "{{citizen_id}}",
+                "documents"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ]
+          },
+          "description": "List citizen documents"
+        },
+        {
+          "name": "OCR Process",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "citizen_id",
+                  "value": "{{citizen_id}}",
+                  "type": "text"
+                },
+                {
+                  "key": "document_type",
+                  "value": "aadhaar",
+                  "type": "text"
+                },
+                {
+                  "key": "file",
+                  "src": "/sample/aadhaar.jpg",
+                  "type": "file"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/ocr/process",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ocr",
+                "process"
+              ]
+            }
+          },
+          "description": "OCR with upload"
+        }
+      ]
+    },
+    {
+      "name": "Grievance Service",
+      "description": "Grievance filing, tracking, and resolution",
+      "item": [
+        {
+          "name": "Create Grievance",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/grievances",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "grievances"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"citizen_id\": \"{{citizen_id}}\",\n  \"category\": \"scheme_related\",\n  \"subject\": \"PM Awas Yojana pending\",\n  \"description\": \"Applied but no update for 6 months.\",\n  \"original_language\": \"hi\",\n  \"priority\": \"high\"\n}"
+            }
+          },
+          "description": "File new grievance"
+        },
+        {
+          "name": "Get Grievance",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/grievances/{{grievance_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "grievances",
+                "{{grievance_id}}"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ]
+          },
+          "description": "Get grievance details"
+        },
+        {
+          "name": "Submit Grievance",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/grievances/{{grievance_id}}/submit",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "grievances",
+                "{{grievance_id}}",
+                "submit"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ]
+          },
+          "description": "Submit for processing"
+        },
+        {
+          "name": "Escalate (Officer)",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/grievances/{{grievance_id}}/escalate",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "grievances",
+                "{{grievance_id}}",
+                "escalate"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ]
+          },
+          "description": "Officer: Escalate grievance"
+        },
+        {
+          "name": "Resolve (Officer)",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/grievances/{{grievance_id}}/resolve",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "grievances",
+                "{{grievance_id}}",
+                "resolve"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resolution_notes\": \"Application approved. Ref: PMAY/2026/45678\"\n}"
+            }
+          },
+          "description": "Officer: Resolve"
+        },
+        {
+          "name": "Reopen Grievance",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/grievances/{{grievance_id}}/reopen",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "grievances",
+                "{{grievance_id}}",
+                "reopen"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ]
+          },
+          "description": "Reopen resolved grievance"
+        },
+        {
+          "name": "Get Tracking",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/grievances/{{grievance_id}}/tracking",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "grievances",
+                "{{grievance_id}}",
+                "tracking"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ]
+          },
+          "description": "Get tracking history"
+        },
+        {
+          "name": "List My Grievances",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/citizens/{{citizen_id}}/grievances",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "citizens",
+                "{{citizen_id}}",
+                "grievances"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ]
+          },
+          "description": "List citizen grievances"
+        },
+        {
+          "name": "List Pending",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/grievances/pending",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "grievances",
+                "pending"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ]
+          },
+          "description": "Officer: Pending grievances"
+        },
+        {
+          "name": "AI Draft",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/ai/grievances/draft",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ai",
+                "grievances",
+                "draft"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Maine PM Awas Yojana ka aavedan kiya tha lekin 6 mahine se koi update nahi mila.\",\n  \"original_language\": \"hi\"\n}"
+            }
+          },
+          "description": "AI draft grievance"
+        }
+      ]
+    },
+    {
+      "name": "Notification Service",
+      "description": "Push/SMS/WhatsApp notifications and templates",
+      "item": [
+        {
+          "name": "Get Notifications",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/notifications?page=1&page_size=20",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "notifications?page=1&page_size=20"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "page_size",
+                  "value": "20"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ]
+          },
+          "description": "Get user notifications"
+        },
+        {
+          "name": "Mark Read",
+          "request": {
+            "method": "PUT",
+            "url": {
+              "raw": "{{base_url}}/notifications/{{notification_id}}/read",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "notifications",
+                "{{notification_id}}",
+                "read"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ]
+          },
+          "description": "Mark as read"
+        },
+        {
+          "name": "Mark All Read",
+          "request": {
+            "method": "PUT",
+            "url": {
+              "raw": "{{base_url}}/notifications/read-all",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "notifications",
+                "read-all"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ]
+          },
+          "description": "Mark all as read"
+        },
+        {
+          "name": "Get Preferences",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/notifications/preferences",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "notifications",
+                "preferences"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ]
+          },
+          "description": "Get notification preferences"
+        },
+        {
+          "name": "Update Preferences",
+          "request": {
+            "method": "PUT",
+            "url": {
+              "raw": "{{base_url}}/notifications/preferences",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "notifications",
+                "preferences"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"push_enabled\": true,\n  \"whatsapp_enabled\": true,\n  \"scheme_alerts\": true\n}"
+            }
+          },
+          "description": "Update preferences"
+        },
+        {
+          "name": "Send (Admin)",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/notifications/send",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "notifications",
+                "send"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"citizen_id\": \"{{citizen_id}}\",\n  \"type\": \"scheme_alert\",\n  \"title\": \"New Scheme Available\",\n  \"body\": \"PM Kisan Samman Nidhi applications are now open.\",\n  \"delivery_channel\": \"all\"\n}"
+            }
+          },
+          "description": "Admin: Send notification"
+        },
+        {
+          "name": "Send Bulk (Admin)",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/notifications/send-bulk",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "notifications",
+                "send-bulk"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"citizen_ids\": [\n    \"{{citizen_id}}\"\n  ],\n  \"type\": \"scheme_alert\",\n  \"title\": \"Deadline Reminder\",\n  \"body\": \"Last date is July 31\"\n}"
+            }
+          },
+          "description": "Admin: Bulk send"
+        },
+        {
+          "name": "List Templates",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/templates",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "templates"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ]
+          },
+          "description": "Admin: List templates"
+        },
+        {
+          "name": "Create Template",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/templates",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "templates"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"app_status\",\n  \"type\": \"application_update\",\n  \"title_template\": \"Application {{status}}\",\n  \"body_template\": \"Your {{scheme}} application is {{status}}.\",\n  \"variables\": [\n    \"status\",\n    \"scheme\"\n  ],\n  \"language\": \"en\",\n  \"channels\": [\n    \"in_app\",\n    \"sms\",\n    \"whatsapp\"\n  ]\n}"
+            }
+          },
+          "description": "Admin: Create template"
+        }
+      ]
+    },
+    {
+      "name": "AI Service",
+      "description": "AI chat, voice, translation and OCR services",
+      "item": [
+        {
+          "name": "AI Chat",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/ai/chat",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ai",
+                "chat"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"citizen_id\": \"{{citizen_id}}\",\n  \"message\": \"Mujhe PM Awas Yojana ke baare mein batao\",\n  \"language\": \"hi\"\n}"
+            }
+          },
+          "description": "Chat with AI in Hindi"
+        },
+        {
+          "name": "Start Voice",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/ai/voice/start",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ai",
+                "voice",
+                "start"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"citizen_id\": \"{{citizen_id}}\",\n  \"language\": \"hi\"\n}"
+            }
+          },
+          "description": "Start voice session"
+        },
+        {
+          "name": "Voice Chunk",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/ai/voice/chunk",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ai",
+                "voice",
+                "chunk"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"session_id\": \"voice-abc\",\n  \"audio_base64\": \"BASE64_AUDIO\",\n  \"encoding\": \"LINEAR16\",\n  \"sample_rate\": 16000\n}"
+            }
+          },
+          "description": "Process voice chunk"
+        },
+        {
+          "name": "End Voice",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/ai/voice/end/voice-abc",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ai",
+                "voice",
+                "end",
+                "voice-abc"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ]
+          },
+          "description": "End voice session"
+        },
+        {
+          "name": "Translate",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/ai/translate",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ai",
+                "translate"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"I want to apply\",\n  \"target_language\": \"hi\",\n  \"source_language\": \"en\"\n}"
+            }
+          },
+          "description": "Translate text"
+        },
+        {
+          "name": "Detect Language",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/ai/translate/detect",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ai",
+                "translate",
+                "detect"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Namaste, main PM Awas Yojana ke baare mein janna chahta hoon\"\n}"
+            }
+          },
+          "description": "Detect language"
+        },
+        {
+          "name": "OCR Process",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/ai/ocr/process",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ai",
+                "ocr",
+                "process"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"image_base64\": \"BASE64_IMAGE\",\n  \"document_type\": \"aadhaar\"\n}"
+            }
+          },
+          "description": "AI OCR process"
+        },
+        {
+          "name": "OCR Analyze",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/ai/ocr/analyze",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ai",
+                "ocr",
+                "analyze"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"document_type\": \"aadhaar\",\n  \"ocr_data\": {\n    \"extracted_fields\": {\n      \"name\": \"Ramesh\"\n    }\n  },\n  \"purpose\": \"Validate authenticity\"\n}"
+            }
+          },
+          "description": "Analyze OCR data"
+        },
+        {
+          "name": "List Conversations",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/ai/conversations?citizen_id={{citizen_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ai",
+                "conversations?citizen_id={{citizen_id}}"
+              ],
+              "query": [
+                {
+                  "key": "citizen_id",
+                  "value": "{{citizen_id}}"
+                }
+              ]
+            }
+          },
+          "description": "List AI conversations"
+        }
+      ]
+    },
+    {
+      "name": "Analytics Service",
+      "description": "Dashboards, KPIs, and data exports",
+      "item": [
+        {
+          "name": "Overview KPIs",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/analytics/overview",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "analytics",
+                "overview"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ]
+          },
+          "description": "Get dashboard KPIs"
+        },
+        {
+          "name": "Realtime Metrics",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/analytics/realtime",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "analytics",
+                "realtime"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ]
+          },
+          "description": "Get realtime metrics"
+        },
+        {
+          "name": "Trends",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/analytics/trends?period=30d",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "analytics",
+                "trends?period=30d"
+              ],
+              "query": [
+                {
+                  "key": "period",
+                  "value": "30d"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ]
+          },
+          "description": "Get trend data"
+        },
+        {
+          "name": "Scheme Analytics",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/analytics/schemes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "analytics",
+                "schemes"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ]
+          },
+          "description": "Get scheme-level analytics"
+        },
+        {
+          "name": "Geo Breakdown",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/analytics/geo",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "analytics",
+                "geo"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ]
+          },
+          "description": "Get geo breakdown"
+        },
+        {
+          "name": "AI Performance",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/analytics/ai-performance",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "analytics",
+                "ai-performance"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ]
+          },
+          "description": "Get AI metrics"
+        },
+        {
+          "name": "Create Export",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/analytics/export",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "analytics",
+                "export"
+              ]
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"format\": \"csv\",\n  \"sections\": [\n    \"overview\",\n    \"schemes\",\n    \"geo\"\n  ]\n}"
+            }
+          },
+          "description": "Create analytics export"
+        }
+      ]
+    }
+  ]
+}

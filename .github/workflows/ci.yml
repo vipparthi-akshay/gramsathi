@@ -1,0 +1,244 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+env:
+  GAR_LOCATION: us-central1
+  GAR_REPOSITORY: gramsathi
+  GCP_PROJECT_ID: gramsathi-prod
+  GOOGLE_SERVICE_ACCOUNT: gramsathi-ci@gramsathi-prod.iam.gserviceaccount.com
+  IMAGE_TAG: ${{ github.sha }}
+  PYTHON_VERSION: "3.11"
+  NODE_VERSION: "20"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Cache Python dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('services/**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install Python lint tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 mypy
+
+      - name: Run flake8 on services
+        run: |
+          for dir in services/*/; do
+            if [ -d "$dir" ]; then
+              flake8 "$dir" --max-line-length=120 --exclude=__pycache__,migrations --count --statistics
+            fi
+          done
+
+      - name: Run mypy on services
+        run: |
+          for dir in services/*/; do
+            if [ -d "$dir/app" ]; then
+              mypy "$dir/app" --ignore-missing-imports --warn-unused-configs --disallow-untyped-defs || true
+            fi
+          done
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('apps/**/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install JS/TS dependencies
+        run: |
+          for app in apps/*/; do
+            cd "$app" && npm ci --ignore-scripts && cd ../..
+          done
+
+      - name: Run ESLint
+        run: |
+          for app in apps/*/; do
+            cd "$app" && npx eslint . --ext .ts,.tsx --max-warnings=0 && cd ../..
+          done
+
+      - name: Run Prettier check
+        run: |
+          for app in apps/*/; do
+            cd "$app" && npx prettier --check . && cd ../..
+          done
+
+  security:
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          scan-ref: .
+          format: sarif
+          output: trivy-results.sarif
+          severity: CRITICAL,HIGH
+
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-results.sarif
+          category: trivy
+
+      - name: Run Semgrep SAST
+        uses: semgrep/semgrep-action@v1
+        with:
+          config: p/default
+          publishToken: ${{ secrets.SEMGREP_APP_TOKEN }}
+          generateSarif: "1"
+
+      - name: Upload Semgrep results
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: semgrep.sarif
+          category: semgrep
+
+  test:
+    runs-on: ubuntu-latest
+    needs: lint
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: gramsathi_test
+          POSTGRES_USER: gramsathi
+          POSTGRES_PASSWORD: gramsathi-test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready -U gramsathi
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Cache Python dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-test-${{ hashFiles('services/**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-test-
+
+      - name: Install test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pytest-asyncio pytest-cov httpx
+          for dir in services/*/; do
+            if [ -f "$dir/requirements.txt" ]; then
+              pip install -r "$dir/requirements.txt"
+            fi
+          done
+
+      - name: Run pytest with coverage
+        env:
+          DATABASE_URL: postgresql+asyncpg://gramsathi:gramsathi-test@localhost:5432/gramsathi_test
+          REDIS_URL: redis://localhost:6379/0
+          APP_ENV: test
+          JWT_PRIVATE_KEY: test-private-key
+          JWT_PUBLIC_KEY: test-public-key
+          GEMINI_API_KEY: test-key
+        run: |
+          python -m pytest services/ \
+            --cov=services \
+            --cov-report=xml \
+            --cov-report=term-missing \
+            --cov-config=.coveragerc \
+            -v
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+  build:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for GAR
+        run: |
+          gcloud auth configure-docker ${{ env.GAR_LOCATION }}-docker.pkg.dev
+
+      - name: Build and push all service images
+        run: |
+          SERVICES=("auth-service" "citizen-service" "ai-service" "scheme-service" "document-service" "grievance-service" "notification-service" "analytics-service")
+          for SERVICE in "${SERVICES[@]}"; do
+            IMAGE="${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.GAR_REPOSITORY }}/$SERVICE"
+            docker build -t "$IMAGE:${{ env.IMAGE_TAG }}" -t "$IMAGE:latest" ./services/$SERVICE
+            docker push "$IMAGE:${{ env.IMAGE_TAG }}"
+            docker push "$IMAGE:latest"
+          done
+
+      - name: Build and push app images
+        run: |
+          APPS=("citizen-web" "admin-web")
+          for APP in "${APPS[@]}"; do
+            IMAGE="${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.GAR_REPOSITORY }}/$APP"
+            docker build -t "$IMAGE:${{ env.IMAGE_TAG }}" -t "$IMAGE:latest" ./apps/$APP
+            docker push "$IMAGE:${{ env.IMAGE_TAG }}"
+            docker push "$IMAGE:latest"
+          done
+
+      - name: Generate image tag artifact
+        run: echo "${{ env.IMAGE_TAG }}" > image-tag.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: image-tag
+          path: image-tag.txt

@@ -1,0 +1,256 @@
+# GramSathi AI — Cloud Armor WAF Rules
+# gcloud compute security-policies create gramsathi-waf \
+#   --description "GramSathi AI WAF Policy"
+# gcloud compute security-policies rules create RULE_PRIORITY \
+#   --security-policy gramsathi-waf [flags]
+
+name: gramsathi-waf
+description: "GramSathi AI Web Application Firewall Policy"
+default_rule_action: "allow"
+type: "CLOUD_ARMOR"
+
+rules:
+  # ─── Pre-configured Rules ──────────────────────────
+
+  # Block SQL Injection
+  - priority: 1000
+    description: "Block SQL injection attacks"
+    action: "deny(403)"
+    match:
+      expr:
+        expression: "evaluatePreconfiguredExpr('sqli-canary')"
+
+  # Block Cross-Site Scripting
+  - priority: 1001
+    description: "Block XSS attacks"
+    action: "deny(403)"
+    match:
+      expr:
+        expression: "evaluatePreconfiguredExpr('xss-canary')"
+
+  # Block Local File Inclusion
+  - priority: 1002
+    description: "Block LFI attacks"
+    action: "deny(403)"
+    match:
+      expr:
+        expression: "evaluatePreconfiguredExpr('lfi-canary')"
+
+  # Block Remote File Inclusion
+  - priority: 1003
+    description: "Block RFI attacks"
+    action: "deny(403)"
+    match:
+      expr:
+        expression: "evaluatePreconfiguredExpr('rfi-canary')"
+
+  # Block Remote Code Execution
+  - priority: 1004
+    description: "Block RCE attacks"
+    action: "deny(403)"
+    match:
+      expr:
+        expression: "evaluatePreconfiguredExpr('rce-canary')"
+
+  # Block Protocol Attacks
+  - priority: 1005
+    description: "Block protocol attacks"
+    action: "deny(403)"
+    match:
+      expr:
+        expression: "evaluatePreconfiguredExpr('protocolattack-canary')"
+
+  # Block Scanner Detection
+  - priority: 1006
+    description: "Block known scanners and bots"
+    action: "deny(403)"
+    match:
+      expr:
+        expression: "evaluatePreconfiguredExpr('scannerdetection-canary')"
+
+  # Block PHP Injection (defense in depth)
+  - priority: 1007
+    description: "Block PHP injection attempts"
+    action: "deny(403)"
+    match:
+      expr:
+        expression: "evaluatePreconfiguredExpr('php-canary')"
+
+  # Block Session Fixation
+  - priority: 1008
+    description: "Block session fixation attempts"
+    action: "deny(403)"
+    match:
+      expr:
+        expression: "evaluatePreconfiguredExpr('sessionfixation-canary')"
+
+  # Block Method Enforcement (only GET, POST, PUT, DELETE, PATCH)
+  - priority: 1010
+    description: "Block disallowed HTTP methods"
+    action: "deny(403)"
+    match:
+      expr:
+        expression: "!request.method.matches('^(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS)$')"
+
+  # ─── Custom Rate Limiting Rules ─────────────────────
+
+  # OTP endpoint rate limiting
+  - priority: 2000
+    description: "Rate limit OTP requests per IP"
+    action: "rate_based_ban"
+    match:
+      expr:
+        expression: "request.path.matches('/auth/otp')"
+    rate_limit_options:
+      rate_limit_threshold:
+        count: 10
+        interval_sec: 60
+      conform_action: "allow"
+      exceed_action: "deny(429)"
+      enforce_on_key: "IP"
+
+  # Login endpoint rate limiting
+  - priority: 2001
+    description: "Rate limit login attempts per IP"
+    action: "rate_based_ban"
+    match:
+      expr:
+        expression: "request.path.matches('/auth/verify')"
+    rate_limit_options:
+      rate_limit_threshold:
+        count: 20
+        interval_sec: 60
+      conform_action: "allow"
+      exceed_action: "deny(429)"
+      enforce_on_key: "IP"
+
+  # AI chat rate limiting
+  - priority: 2002
+    description: "Rate limit AI chat per IP"
+    action: "rate_based_ban"
+    match:
+      expr:
+        expression: "request.path.matches('/ai/chat')"
+    rate_limit_options:
+      rate_limit_threshold:
+        count: 60
+        interval_sec: 60
+      conform_action: "allow"
+      exceed_action: "deny(429)"
+      enforce_on_key: "IP"
+
+  # General API rate limiting
+  - priority: 2003
+    description: "General API rate limit per IP"
+    action: "rate_based_ban"
+    match:
+      expr:
+        expression: "true"
+    rate_limit_options:
+      rate_limit_threshold:
+        count: 1000
+        interval_sec: 60
+      conform_action: "allow"
+      exceed_action: "deny(429)"
+      enforce_on_key: "IP"
+
+  # ─── Geo-Restrictions ──────────────────────────────
+
+  # Block non-India traffic for citizen-facing endpoints
+  - priority: 3000
+    description: "Allow traffic only from India"
+    action: "deny(403)"
+    match:
+      expr:
+        expression: |
+          origin.region_code != 'IN' &&
+          request.path.matches('^(/auth|/citizens|/schemes|/applications|/documents|/grievances|/notifications|/ai)')
+
+  # ─── IP Blacklist / Whitelist ──────────────────────
+
+  # Admin dashboard restricted to gov IP range
+  - priority: 3100
+    description: "Allow admin dashboard only from government IP range"
+    action: "deny(403)"
+    match:
+      expr:
+        expression: |
+          request.path.matches('^/admin') &&
+          !inIpRange(origin.ip, '103.21.244.0/22') &&
+          !inIpRange(origin.ip, '103.22.200.0/22') &&
+          !inIpRange(origin.ip, '103.31.4.0/22')
+
+  # Known bad IPs (example)
+  - priority: 4000
+    description: "Block known malicious IPs"
+    action: "deny(403)"
+    match:
+      expr:
+        expression: |
+          inIpRange(origin.ip, '198.51.100.0/24') ||
+          inIpRange(origin.ip, '203.0.113.0/24')
+
+  # ─── Request Validation ────────────────────────────
+
+  # Block requests with missing User-Agent
+  - priority: 5000
+    description: "Block requests missing User-Agent header"
+    action: "deny(403)"
+    match:
+      expr:
+        expression: |
+          !has(request.headers['user-agent']) ||
+          request.headers['user-agent'] == ''
+
+  # Block oversized requests
+  - priority: 5001
+    description: "Block requests > 5 MB"
+    action: "deny(413)"
+    match:
+      expr:
+        expression: |
+          request.content_length > 5242880
+
+  # ─── Exception Rules (allow specific patterns) ─────
+
+  # Allow health checks from GCP LB
+  - priority: 100
+    description: "Allow GCP health check probes"
+    action: "allow"
+    match:
+      expr:
+        expression: |
+          has(request.headers['user-agent']) &&
+          request.headers['user-agent'] == 'GoogleHC'
+
+  # Allow OPTIONS preflight
+  - priority: 110
+    description: "Allow CORS preflight"
+    action: "allow"
+    match:
+      expr:
+        expression: "request.method == 'OPTIONS'"
+
+  # Allow public scheme list (no auth required)
+  - priority: 120
+    description: "Allow public scheme endpoints"
+    action: "allow"
+    match:
+      expr:
+        expression: |
+          request.path.matches('^/schemes$') ||
+          request.path.matches('^/schemes/categories') ||
+          request.path.matches('^/eligibility/criteria/')
+
+# ─── Adaptive Protection (ML-based) ──────────────────
+adaptive_protection:
+  auto_deploy:
+    enabled: true
+    confidence_threshold: 0.7
+    impact: 30  # max % of traffic to block
+
+# ─── Logging ──────────────────────────────────────────
+logging:
+  enable: true
+  include_headers: true
+  sampling_rate: 1.0
