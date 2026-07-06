@@ -3,8 +3,20 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { Box, CircularProgress } from "@mui/material";
 import { useAuth } from "@/store/authStore";
 import DashboardLayout from "@/components/Layout/DashboardLayout";
-import { routes } from "@/routes";
-import type { RouteConfig, UserRole } from "@/routes";
+import type { UserRole } from "@/routes";
+import LoginPage from "@/pages/Login";
+import DashboardPage from "@/pages/Dashboard";
+import SchemesPage from "@/pages/Schemes";
+import SchemeFormPage from "@/pages/SchemeForm";
+import ApplicationsPage from "@/pages/Applications";
+import ApplicationReviewPage from "@/pages/ApplicationReview";
+import GrievancesPage from "@/pages/Grievances";
+import GrievanceDetailPage from "@/pages/GrievanceDetail";
+import CitizensPage from "@/pages/Citizens";
+import CitizenDetailPage from "@/pages/CitizenDetail";
+import AnalyticsPage from "@/pages/Analytics";
+import UsersPage from "@/pages/Users";
+import SettingsPage from "@/pages/Settings";
 
 function ProtectedRoute({
   children,
@@ -24,65 +36,6 @@ function ProtectedRoute({
   }
 
   return <>{children}</>;
-}
-
-function renderRoutes(routeList: RouteConfig[]) {
-  return routeList.map((route) => {
-    if (route.children) {
-      return (
-        <Route
-          key={route.path}
-          path={route.path}
-          element={
-            <ProtectedRoute roles={route.roles}>
-              {route.element || <DashboardLayout />}
-            </ProtectedRoute>
-          }
-        >
-          {route.children.map((child) => (
-            <Route
-              key={child.path}
-              index={child.path === ""}
-              path={child.path !== "" ? child.path : undefined}
-              element={
-                <Suspense fallback={<LoadingFallback />}>
-                  {child.element}
-                </Suspense>
-              }
-            />
-          ))}
-        </Route>
-      );
-    }
-
-    if (route.path === "/login") {
-      return (
-        <Route
-          key={route.path}
-          path={route.path}
-          element={
-            <Suspense fallback={<LoadingFallback />}>{route.element}</Suspense>
-          }
-        />
-      );
-    }
-
-    return (
-      <Route
-        key={route.path}
-        path={route.path}
-        element={
-          <ProtectedRoute roles={route.roles}>
-            <DashboardLayout>
-              <Suspense fallback={<LoadingFallback />}>
-                {route.element}
-              </Suspense>
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
-    );
-  });
 }
 
 function LoadingFallback() {
@@ -227,17 +180,3 @@ export default function App() {
     </Routes>
   );
 }
-
-import LoginPage from "@/pages/Login";
-import DashboardPage from "@/pages/Dashboard";
-import SchemesPage from "@/pages/Schemes";
-import SchemeFormPage from "@/pages/SchemeForm";
-import ApplicationsPage from "@/pages/Applications";
-import ApplicationReviewPage from "@/pages/ApplicationReview";
-import GrievancesPage from "@/pages/Grievances";
-import GrievanceDetailPage from "@/pages/GrievanceDetail";
-import CitizensPage from "@/pages/Citizens";
-import CitizenDetailPage from "@/pages/CitizenDetail";
-import AnalyticsPage from "@/pages/Analytics";
-import UsersPage from "@/pages/Users";
-import SettingsPage from "@/pages/Settings";
