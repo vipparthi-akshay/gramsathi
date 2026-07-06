@@ -2,7 +2,7 @@
 
 **AI-Powered Multilingual Government Assistant for Rural Citizens**
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-Admin%20Dashboard-1976D2?style=for-the-badge)](https://vipparthi-akshay.github.io/gramsathi/)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Citizen%20App-1976D2?style=for-the-badge)](https://vipparthi-akshay.github.io/gramsathi/)
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Deployed-success?style=for-the-badge)](https://vipparthi-akshay.github.io/gramsathi/)
 
 GramSathi AI is a comprehensive platform that helps rural citizens in India discover, apply for, and track government welfare schemes using AI-powered assistance in multiple Indian languages.
