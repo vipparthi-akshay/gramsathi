@@ -8,7 +8,6 @@ import {
   CardContent,
   Button,
   Chip,
-  Divider,
   TextField,
   Avatar,
   List,
@@ -16,7 +15,6 @@ import {
   ListItemIcon,
   ListItemText,
   IconButton,
-  Alert,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";

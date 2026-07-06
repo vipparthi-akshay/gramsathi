@@ -12,7 +12,6 @@ import {
   IconButton,
   Tooltip,
   Switch,
-  FormControlLabel,
   Chip,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
@@ -110,15 +109,7 @@ const departments = [
   "Regional Office",
   "System Administration",
 ];
-const allPermissions = [
-  "manage_schemes",
-  "manage_users",
-  "view_analytics",
-  "process_applications",
-  "view_citizens",
-  "manage_grievances",
-  "manage_settings",
-];
+
 
 export default function Users() {
   const { filters, setFilter, clearFilters } = useFilters();

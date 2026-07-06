@@ -40,7 +40,6 @@ export default function SentimentIndicator({
   size = "medium",
 }: SentimentIndicatorProps) {
   const config = sentimentConfig[sentiment] || sentimentConfig.neutral;
-  const iconSize = size === "small" ? 20 : 28;
 
   return (
     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>

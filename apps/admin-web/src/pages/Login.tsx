@@ -42,8 +42,8 @@ export default function Login() {
     try {
       await login(email, password);
       navigate("/overview");
-    } catch (err: any) {
-      setError(err.message || "Login failed");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Login failed");
     } finally {
       setLoading(false);
     }
@@ -57,8 +57,8 @@ export default function Login() {
     try {
       await login(email, "otp-" + otp);
       navigate("/overview");
-    } catch (err: any) {
-      setError(err.message || "OTP verification failed");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "OTP verification failed");
     } finally {
       setLoading(false);
     }

@@ -133,7 +133,7 @@ export const useDashboardStore = create<DashboardState>((set) => ({
     await new Promise((r) => setTimeout(r, 500));
     const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
     set({
-      trendData: days.map((day, i) => ({
+      trendData: days.map((day) => ({
         date: day,
         applications: Math.floor(80 + Math.random() * 120),
         approvals: Math.floor(40 + Math.random() * 80),

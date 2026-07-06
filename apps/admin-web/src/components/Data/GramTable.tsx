@@ -4,8 +4,6 @@ import {
   Checkbox,
   IconButton,
   Typography,
-  Menu,
-  MenuItem,
   Button,
   Table,
   TableBody,
@@ -16,9 +14,7 @@ import {
   TablePagination,
   TableSortLabel,
   Paper,
-  Chip,
 } from "@mui/material";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import DeleteIcon from "@mui/icons-material/Delete";
 
@@ -69,7 +65,6 @@ export default function GramTable<T>({
 }: GramTableProps<T>) {
   const [sortColumn, setSortColumn] = useState<string>("");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleSort = (column: string) => {
     const isAsc = sortColumn === column && sortDirection === "asc";

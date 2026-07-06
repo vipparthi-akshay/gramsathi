@@ -9,7 +9,6 @@ import {
   Typography,
   IconButton,
   Divider,
-  Collapse,
   Avatar,
 } from "@mui/material";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
@@ -21,8 +20,7 @@ import PeopleIcon from "@mui/icons-material/People";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import SettingsIcon from "@mui/icons-material/Settings";
-import ExpandLess from "@mui/icons-material/ExpandLess";
-import ExpandMore from "@mui/icons-material/ExpandMore";
+
 import { useAuth } from "@/store/authStore";
 import type { UserRole } from "@/routes";
 

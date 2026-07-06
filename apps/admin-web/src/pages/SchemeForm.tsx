@@ -12,14 +12,12 @@ import {
   MenuItem,
   Autocomplete,
   IconButton,
-  FormControlLabel,
-  Switch,
   Divider,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import PreviewIcon from "@mui/icons-material/Preview";
+
 import type { SchemeFormData } from "@/services/schemes";
 
 const categories = [
@@ -87,7 +85,7 @@ export default function SchemeForm() {
   >([{ key: "", value: "" }]);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const updateField = (field: string, value: any) => {
+  const updateField = (field: string, value: unknown) => {
     setForm((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) setErrors((prev) => ({ ...prev, [field]: "" }));
   };
@@ -110,7 +108,8 @@ export default function SchemeForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
-    const finalForm = {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const _finalForm = {
       ...form,
       benefits: benefits.filter((b) => b.trim()),
       eligibilityCriteria: Object.fromEntries(
@@ -119,7 +118,6 @@ export default function SchemeForm() {
           .map((e) => [e.key, e.value]),
       ),
     };
-    // console.log('Submit:', finalForm);
     navigate("/schemes");
   };
 

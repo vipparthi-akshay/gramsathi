@@ -6,8 +6,6 @@ import {
   Card,
   CardContent,
   Button,
-  Chip,
-  Divider,
 } from "@mui/material";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import {
@@ -86,7 +84,7 @@ const aiPerformance = {
 export default function Analytics() {
   const [exporting, setExporting] = useState(false);
 
-  const handleExport = (format: string) => {
+  const handleExport = (_format: string) => {
     setExporting(true);
     setTimeout(() => setExporting(false), 1500);
   };

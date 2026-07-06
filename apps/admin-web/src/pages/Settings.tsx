@@ -9,7 +9,6 @@ import {
   Button,
   Switch,
   FormControlLabel,
-  Divider,
   Select,
   MenuItem,
   InputLabel,

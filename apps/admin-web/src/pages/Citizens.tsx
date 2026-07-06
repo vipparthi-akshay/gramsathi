@@ -3,10 +3,8 @@ import { useNavigate } from "react-router-dom";
 import {
   Box,
   Typography,
-  Chip,
   IconButton,
   Tooltip,
-  Button,
 } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VerifiedIcon from "@mui/icons-material/Verified";
@@ -55,18 +53,7 @@ const mockCitizens: Citizen[] = Array.from({ length: 50 }, (_, i) => ({
   updatedAt: new Date().toISOString(),
 }));
 
-const indianStates = [
-  "Uttar Pradesh",
-  "Maharashtra",
-  "Bihar",
-  "Rajasthan",
-  "Madhya Pradesh",
-  "Tamil Nadu",
-  "Karnataka",
-  "Gujarat",
-  "West Bengal",
-  "Odisha",
-];
+
 
 export default function Citizens() {
   const navigate = useNavigate();

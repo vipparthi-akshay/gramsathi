@@ -14,7 +14,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
   IconButton,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
@@ -36,7 +35,6 @@ import AIInsightsPanel from "@/components/Dashboard/AIInsightsPanel";
 import GeoHeatMap from "@/components/Dashboard/GeoHeatMap";
 import StatusBadge from "@/components/Data/StatusBadge";
 import { useDashboardStore } from "@/store/dashboardStore";
-import type { KPI } from "@/store/dashboardStore";
 
 const pendingApplications = [
   {
@@ -78,16 +76,14 @@ const pendingApplications = [
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { kpis, trendData, fetchOverview, fetchTrends, loading } =
+  const { kpis, trendData, fetchOverview, fetchTrends } =
     useDashboardStore();
   const theme = useTheme();
   const [refreshing, setRefreshing] = useState(false);
-  const [animateKpis, setAnimateKpis] = useState(false);
 
   useEffect(() => {
     fetchOverview();
     fetchTrends();
-    setTimeout(() => setAnimateKpis(true), 300);
   }, [fetchOverview, fetchTrends]);
 
   const handleRefresh = async () => {
